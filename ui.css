@@ -1070,6 +1070,8 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .msg--face { display: grid; grid-template-columns: var(--msg-face) minmax(0, 1fr); column-gap: var(--space-3); }
 .msg__face { height: calc(var(--text-lg) * var(--leading-body)); display: flex; align-items: center; overflow: visible; }
 .msg__face .agent { --agent-face: var(--msg-face); }
+/* A reply made of parts (what it did, its plan, its text, the files changed): .msg__body stacks them 12 apart. */
+.msg__body { min-width: 0; display: flex; flex-direction: column; gap: var(--space-3); }
 /* No face: the reply takes the whole width, no empty column at its left. */
 .msg--face:not(:has(> .msg__face)) { display: block; }
 /* The face stays on the middle of the reply's first line of text, also when the reply opens with a box

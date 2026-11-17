@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.14 (2026-11-17)
+
+- `.msg__body`: a reply made of parts (what the agent did, its plan, its text, the files changed) stacks them `space_3` (12) apart. The face stays on the first line of the first part.
+
 ## 1.1.13 (2026-11-17)
 
 The chat's harness parts, with the values approved in the LawEditor Harness Lab.
