@@ -30,9 +30,9 @@ body {
    default; theme({ radius }) or data-radius on a container ("rounded" | "pill" | "sharp") shapes buttons and
    segmented alike; .btn--pill / .btn--sharp for one button.
    .btn--primary is filled accent and .btn--ghost is plain neutral, under their older names. */
-:root, [data-radius="rounded"] { --btn-radius: var(--radius-md); --btn-radius-sm: var(--radius-sm); --seg-radius: var(--segmented-outer-radius); --seg-radius-inner: var(--segmented-inner-radius); --input-radius: var(--radius-md); }   /* rounded is the default */
-[data-radius="pill"] { --btn-radius: var(--radius-full); --btn-radius-sm: var(--radius-full); --seg-radius: var(--radius-full); --seg-radius-inner: var(--radius-full); --input-radius: var(--radius-full); }
-[data-radius="sharp"] { --btn-radius: var(--space-0); --btn-radius-sm: var(--space-0); --seg-radius: var(--space-0); --seg-radius-inner: var(--space-0); --input-radius: var(--space-0); }
+:root, [data-radius="rounded"] { --chat-box-x: var(--space-3); --chat-box-radius: var(--radius-lg); --chat-card-radius: var(--radius-md); --btn-radius: var(--radius-md); --btn-radius-sm: var(--radius-sm); --seg-radius: var(--segmented-outer-radius); --seg-radius-inner: var(--segmented-inner-radius); --input-radius: var(--radius-md); }   /* rounded is the default */
+[data-radius="pill"] { --chat-box-x: var(--space-4); --chat-box-radius: calc(var(--text-lg) * var(--leading-body) / 2 + var(--space-3)); --chat-card-radius: var(--radius-lg); --btn-radius: var(--radius-full); --btn-radius-sm: var(--radius-full); --seg-radius: var(--radius-full); --seg-radius-inner: var(--radius-full); --input-radius: var(--radius-full); }
+[data-radius="sharp"] { --chat-box-x: var(--space-3); --chat-box-radius: var(--space-0); --chat-card-radius: var(--space-0); --btn-radius: var(--space-0); --btn-radius-sm: var(--space-0); --seg-radius: var(--space-0); --seg-radius-inner: var(--space-0); --input-radius: var(--space-0); }
 .btn {
   --tone: var(--accent); --tone-soft: var(--accent-soft); --tone-fg: var(--accent-fg); --tone-text: var(--accent-text);
   position: relative;
@@ -343,15 +343,17 @@ textarea.input { display: block; width: 100%; height: auto; min-height: var(--te
        </div>
        <div class="menu__foot"><span class="menu__note">…</span><button class="btn btn--sm">…</button></div>
      </div></div> */
-.menu--wide { width: var(--menu-wide); }
+.menu--wide { width: var(--menu-wide); padding-top: var(--space-0); }
+/* An item can say what it does at its right (commands typed with /): <span class="menu__desc">. */
+.menu__desc { margin-left: auto; font-size: var(--text-sm); color: var(--text-detail); }
 .menu__section {
   display: flex; flex-direction: column;
   margin: 0 calc(var(--space-hairline) * -1) calc(var(--space-hairline) * -1);
   border-top: var(--border-width) solid var(--border);
 }
 .menu__head {
-  display: flex; align-items: center; gap: var(--space-2);
-  padding: var(--space-2) var(--space-2) var(--space-1);
+  display: flex; align-items: center; gap: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-1) var(--space-3);
   font-size: var(--text-sm); font-weight: var(--weight-semibold); color: var(--text);
 }
 .menu__field { display: flex; padding: 0 var(--space-2) var(--space-2); }
@@ -672,6 +674,8 @@ a.row:hover .row__title { color: var(--text-2); text-decoration: underline; text
 .block:hover { background: var(--surface-2); }
 .block[aria-selected="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 var(--border-width) var(--accent); }
 .block__slot { height: calc(var(--text-lg) * var(--leading-body)); display: flex; align-items: center; }
+/* A block without its dot has no dot column: the text starts at the left. */
+.block:not(:has(> .block__slot)) { grid-template-columns: minmax(0, 1fr); }
 .block__text { min-width: 0; outline: none; font-size: var(--text-lg); line-height: var(--leading-body); overflow-wrap: anywhere; }
 .block__text:empty::before { content: attr(data-placeholder); color: var(--text-detail); }
 .block--title .block__slot { height: calc(var(--text-2xl) * var(--leading-tight)); }
@@ -1019,9 +1023,9 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .msg--me {
   align-self: flex-end;
   max-width: min(var(--msg-max), 100%);
-  padding: var(--space-2) var(--space-3);
-  background: var(--surface-2);
-  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--chat-box-x);       /* a chat box: 12 on top and bottom; the sides follow the shape */
+  background: var(--accent-soft);
+  border-radius: var(--chat-box-radius);
   white-space: pre-wrap;
 }
 .composer { flex: none; padding: var(--space-3) var(--space-5) var(--space-5); background: var(--bg); }
@@ -1063,8 +1067,99 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 
 /* The agent's face beside its reply: <div class="msg msg--face"><div class="msg__face"><div>(agent sm)</div></div><div>text</div></div>.
    The face cell is one text line tall, so a reply is as tall as its text; the face is centered on the first line. */
-.msg--face { display: grid; grid-template-columns: var(--agent-sm) minmax(0, 1fr); column-gap: var(--space-3); }
+.msg--face { display: grid; grid-template-columns: var(--msg-face) minmax(0, 1fr); column-gap: var(--space-3); }
 .msg__face { height: calc(var(--text-lg) * var(--leading-body)); display: flex; align-items: center; overflow: visible; }
+.msg__face .agent { --agent-face: var(--msg-face); }
+/* No face: the reply takes the whole width, no empty column at its left. */
+.msg--face:not(:has(> .msg__face)) { display: block; }
+/* The face stays on the middle of the reply's first line of text, also when the reply opens with a box
+   (its padding comes first) or with smaller text: each opener says how far down its first line is. */
+.msg--face:has(> .msg__face + .block) > .msg__face, .msg--face:has(> .msg__face + * > .block:first-child) > .msg__face { margin-top: var(--space-3); }
+.msg--face:has(> .msg__face + .working) > .msg__face, .msg--face:has(> .msg__face + * > .working:first-child) > .msg__face { margin-top: calc(var(--space-3) + (var(--text-sm) - var(--text-lg)) * var(--leading-body) / 2); }
+.msg--face:has(> .msg__face + .tools) > .msg__face, .msg--face:has(> .msg__face + * > .tools:first-child) > .msg__face { margin-top: calc(var(--space-2) + (var(--text-sm) - var(--text-lg)) * var(--leading-body) / 2); }
+.msg--face:has(> .msg__face + .changes) > .msg__face, .msg--face:has(> .msg__face + * > .changes:first-child) > .msg__face { margin-top: calc(var(--space-2) + var(--border-width) + (var(--control-sm) - var(--text-lg) * var(--leading-body)) / 2); }
+.msg--face:has(> .msg__face + .code-block) > .msg__face, .msg--face:has(> .msg__face + * > .code-block:first-child) > .msg__face { margin-top: calc(var(--space-3) + var(--border-width) + (var(--text-xs) - var(--text-lg)) * var(--leading-body) / 2); }
+.msg--face:has(> .msg__face + .prose > h3:first-child) > .msg__face { margin-top: calc((var(--text-xl) - var(--text-lg)) * var(--leading-body) / 2); }
+.msg--face:has(> .msg__face + .plan) > .msg__face, .msg--face:has(> .msg__face + * > .plan:first-child) > .msg__face { margin-top: calc((var(--text-sm) - var(--text-lg)) * var(--leading-body) / 2); }
+
+/* ---------- Harness parts in the chat (values from the Harness Lab, 2026-11-17) ----------
+   A card in the chat is a .block (with or without its dot) and an .actions row. Boxes in the chat
+   (the person's bubble, the working line, a card's block) have 12 on top and bottom and --chat-box-x
+   on the sides: 12, or 16 on pill. */
+.msg .block { padding: var(--space-3) var(--chat-box-x); }
+
+/* Markdown in a reply: a heading that opens it doesn't push it down; the rest as approved in the lab. */
+.msg .prose > :first-child { margin-top: 0; }
+.msg .prose h3 { font-size: var(--text-xl); margin-bottom: var(--space-3); }
+.msg .prose :not(pre) > code { padding: var(--space-hairline) var(--space-2); color: var(--text); }
+.msg .prose :is(ul, ol) { margin-top: 0; padding-left: var(--space-5); }
+.msg .prose .code-block { background: var(--surface); }
+.msg .code-block { border-radius: var(--chat-card-radius); }
+.msg .code-block__head { gap: var(--space-3); padding-top: var(--space-3); padding-right: var(--space-3); padding-bottom: var(--space-3); }
+
+/* Working: what the agent does right now. A dot, the verb, what it works on, how long.
+   <div class="working"><span class="dot dot--warning"></span><span class="working__verb">Running</span>
+   <span class="working__what mono">npm test</span><span class="working__time">12s</span></div> */
+.working {
+  display: flex; align-items: center; gap: var(--space-2);
+  padding: var(--space-3) var(--chat-box-x);
+  background: var(--surface); border-radius: var(--chat-box-radius);
+  font-size: var(--text-sm); color: var(--text-2);
+}
+.working > .dot { width: var(--working-dot); height: var(--working-dot); margin-right: var(--space-1); }
+.working__verb { font-weight: var(--weight-semibold); color: var(--text); }
+.working__what { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.working__time { margin-left: auto; color: var(--text-detail); font-variant-numeric: tabular-nums; }
+
+/* Tool lines: what the agent did, one short line each, that opens to show the output. Built on .disclosure.
+   <div class="tools"><details class="disclosure tool"><summary>(chevron)<span class="tool__kind">Run</span>
+   <span class="tool__what mono">ls</span><span class="tool__meta">0.2s</span></summary><pre class="tool__out">…</pre></details></div> */
+.tools { display: flex; flex-direction: column; gap: var(--space-hairline); }
+.tool > summary { gap: var(--space-2); padding: var(--space-2); font-size: var(--text-sm); }
+.tool > summary > .icon:first-child { width: var(--icon-md); height: var(--icon-md); color: var(--text-3); }
+.tool__kind { flex: none; min-width: var(--menu-lead); font-weight: var(--weight-semibold); color: var(--text-2); }
+.tool__kind--accent { color: var(--accent-text); }
+.tool__kind--warning { color: var(--warning-text); }
+.tool__what { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tool__meta { flex: none; color: var(--text-detail); font-variant-numeric: tabular-nums; }
+.tool__out { margin: 0 0 var(--space-1) var(--space-6); padding: var(--space-2) var(--space-3); border-left: var(--border-width) solid var(--border); font-family: var(--font-mono); font-size: var(--text-sm); color: var(--text-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Files changed in a reply: a head (a title and a button) and one row per file. The rows share the box's
+   columns, so the numbers of every row start at the same place, at the left of their column. */
+.changes { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; border: var(--border-width) solid var(--border); border-radius: var(--chat-card-radius); background: var(--surface); overflow: hidden; }
+.changes__head { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--space-2); font-size: var(--text-sm); font-weight: var(--weight-semibold); border-bottom: var(--border-width) solid var(--border); }
+.changes__row { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; column-gap: var(--space-3); padding: var(--space-1) var(--space-1) var(--space-1) var(--space-2); font-size: var(--text-sm); }
+.changes__row + .changes__row { border-top: var(--border-width) solid var(--border); }
+.changes__file { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.changes__add, .changes__del { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: left; }
+.changes__add { color: var(--success-text); }
+.changes__del { color: var(--danger-text); }
+
+/* Plan: the steps, each with a thread node (without the line). Done is green; now fills like a clock,
+   ever slower, with the thread's glow; next is the ring. The nodes come in one after another (--i on
+   each step); add .is-pop to a step that just finished. Any list of dots in the chat looks like this.
+   <ol class="plan"><li class="plan__step is-done" style="--i: 0"><span class="plan__node"><i class="node__core"></i></span>
+   <span class="plan__text">Make the map</span></li>…</ol> */
+@property --p { syntax: "<number>"; inherits: true; initial-value: 0; }
+.plan { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--space-1); }
+.plan__step { display: flex; align-items: center; gap: var(--space-3); font-size: var(--text-sm); color: var(--text-2); transition: color var(--duration-enter) var(--ease); }
+.plan__step.is-done { color: var(--text-detail); text-decoration: line-through; }
+.plan__step.is-now { color: var(--text); font-weight: var(--weight-semibold); }
+.plan__node { position: relative; flex: none; width: var(--plan-node); height: var(--plan-node); border-radius: var(--radius-full); animation: plan-in var(--duration-enter) var(--ease-spring) both; animation-delay: calc(var(--i, 0) * var(--stagger)); }
+.plan__node::before { content: ""; position: absolute; inset: calc(var(--plan-node) / -4); border-radius: var(--radius-full); background: var(--accent); filter: blur(var(--space-1)); opacity: 0; transition: opacity var(--duration-enter) var(--ease); }
+.plan__step.is-now .plan__node::before { opacity: .3; }
+.plan__step.is-done .node__core { background: var(--success); border-color: var(--success); }
+.plan__step.is-now .node__core { border-color: var(--accent); animation: plan-fill calc(var(--duration-read) * 4) var(--ease) forwards; }
+.plan__step.is-pop .plan__node { animation: plan-pop var(--duration-enter) var(--ease-spring); }
+@keyframes plan-in { from { transform: scale(0); } }
+@keyframes plan-pop { from { transform: scale(.6); } }
+@keyframes plan-fill { from { --p: 0; } to { --p: .9; } }
+
+/* How much of the context is used: a label, a bar, the value. */
+.meter { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-2); }
+.meter__bar { flex: 1; min-width: var(--space-8); height: var(--meter-bar); border-radius: var(--radius-full); background: var(--surface-2); overflow: hidden; }
+.meter__bar > span { display: block; height: 100%; background: var(--accent); transition: width var(--duration-enter) var(--ease); }
+.meter__value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
 /* The composer's field: one box, the text and a round send button inside it, as tall as a control_lg.
    The button shows when there is text. .composer__bar sits under the box, for quiet controls (dropdowns). */
@@ -1093,6 +1188,12 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
   transition: transform var(--duration-enter) var(--ease-spring), opacity var(--duration) var(--ease);
 }
 .composer__send:disabled { transform: scale(0); opacity: 0; }
+/* While the agent works, the send button turns into Stop (a square): <button class="… composer__send composer__stop">. */
+.composer__stop { background: var(--text); border-color: var(--text); color: var(--surface); }
+/* Files attached or mentioned (@): chips above the text, inside the field's box. */
+.composer__field:has(> .composer__chips) { flex-wrap: wrap; }
+.composer__chips { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: var(--space-1); padding: var(--space-1) var(--space-1) 0; }
+.composer__chips .tag { gap: var(--space-hairline); padding-right: var(--space-0); }
 .composer__bar { max-width: var(--measure); margin: var(--space-1) auto 0; display: flex; align-items: center; gap: var(--space-hairline); }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1245,6 +1346,9 @@ html:not([data-narrow]) .window:not(.is-full) {
 @media (prefers-reduced-motion: reduce) {
   .status-ring circle, .dot, .node, .thread__reading { animation: none !important; }
   .thread__glow { display: none; }
+  .plan__node, .plan__step.is-pop .plan__node, .plan__step.is-now .node__core { animation: none; }
+  .plan__node::before { display: none; }
+  .meter__bar > span { transition: none; }
   [data-status="ok"] > .status-ring circle, [data-status="hold"] > .status-ring circle { stroke-dasharray: none; }
   .window, .side { transition: none; }
 }

@@ -127,6 +127,12 @@ def agent_xl() -> U32: 160
 def msg_max() -> U32: 480            # the person's message, at most this wide
 def msg_gap() -> U32: space_5()      # space between messages
 def composer_max() -> U32: 160       # the composer grows with its text up to this, then scrolls
+# The agent's face beside its reply (the Harness Lab, 2026-11-17)
+def msg_face() -> U32: control_lg()
+# Harness parts in the chat: the working dot, a plan's node, the context meter's bar
+def working_dot() -> U32: space_3()
+def plan_node() -> U32: space_3()
+def meter_bar() -> U32: space_1()
 
 # Menu with a list: a section of rows that scrolls inside the menu
 def menu_list_rows() -> U32: 8       # the list shows this many rows, then scrolls inside the menu

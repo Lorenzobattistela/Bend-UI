@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.13 (2026-11-17)
+
+The chat's harness parts, with the values approved in the LawEditor Harness Lab.
+
+- **Chat boxes follow the shape**: the person's bubble, the working line and a card's block have `space_3` (12) on top and bottom and `--chat-box-x` on the sides: 12 on sharp and rounded, 16 on pill. Their corner is `--chat-box-radius` (radius_lg; none on sharp; a pill's half height on pill). Boxes that hold rows (files changed, a code block in a reply) use `--chat-card-radius` (radius_md; none; radius_lg). The person's bubble is now on `accent-soft`.
+- **The face**: `msg_face` (control_lg, 36) beside a reply, 12 from it. It stays on the middle of the reply's first line also when the reply opens with a box, a heading, smaller text or a plan. A `.msg--face` without its face takes the whole width.
+- **A block without its dot** has no dot column: the text starts at the left (an error card).
+- **Markdown in a reply**: a heading that opens it has no top margin; `h3` is text_xl with 12 under it; inline code 2/8 in the text color; lists 24 in, no top margin; a code block on `surface`. A code block's head in a reply has 12 around and between.
+- **New**: `.working` (dot `working_dot` 12, verb, what, time), `.tools` / `.tool` (a line per thing the agent did, on `.disclosure`, opening to `.tool__out`), `.changes` (head and rows sharing columns, numbers aligned left), `.plan` (each step a thread node `plan_node` 12, without the line: now fills with the thread's glow, done turns green, `.is-pop` when one finishes, `--i` staggers them in), `.meter` (context used, bar `meter_bar` 4), `.composer__stop` (send turns into Stop), `.composer__chips` (files attached above the text), `.menu__desc` (what a / command does).
+- **Menu with a list**: the head has 12 at the left and between its title and count; a wide menu has no padding on top.
+- Docs: Chat page, Harness parts.
+
 ## 1.1.12 (2026-11-17)
 
 - **Open card**: `cardDialog(dialog)` turns a `<dialog class="dialog">` into the dialog a card opens into (`.card-dialog`): a head, a `.card-dialog__body` with the title and notes as `.card-dialog__field` (textareas with no box of their own) and a `.card-dialog__data` row, and `.actions` under it. It opens `card_dialog_open_top` (64) from the top and `card_dialog_open_height` (60dvh) tall, its rows rising in with the menu's rise. Typing past its height, it grows down, moves up when it touches the bottom and stops at the top; only then its middle scrolls, and the head, the buttons and the padding at the bottom never scroll. `BOARD.bend` has its measures (all undecided) and `card_dialog_top`, the rule of where it sits, with three laws in `BOARD_LAWS.bend`. A field shows it can be edited by `card_dialog_editable` ("tint": the ghost button's hover background, `card_dialog_edit_pad` past the text; also "line" and "cursor"; undecided). Escape and a click outside close it.

@@ -217,6 +217,8 @@ Or one field with the send button inside, and quiet controls under it:
 
 The agent's reply with its face: `<div class="msg msg--face"><div class="msg__face"><div></div></div><div>…</div></div>` (mount an `sm` agent in the inner div). Your new message gets `is-arriving`; a streamed answer puts each word in a `.msg__word`.
 
+Harness parts (1.1.13), each inside a reply: `.working` (what the agent does now), `.tools` with a `.tool` per action (a `.disclosure` whose summary has `.tool__kind`, `.tool__what`, `.tool__meta`, and a `.tool__out`), `.plan` with `.plan__step` (`.is-done`, `.is-now`, `.is-pop`; a `.plan__node` holding an `.node__core`, and `.plan__text`), `.changes` (`.changes__head`, then `.changes__row` with `.changes__file`, `.changes__add`, `.changes__del`). A card is a `.block` and an `.actions` row; leave out its `.block__slot` for a card without a dot. In the composer: `.composer__chips` above the text, `.composer__stop` for the send button while the agent works, and `.meter` for the context used. Chat boxes follow the shape (`data-radius`): 12 on the sides, 16 on pill.
+
 ## Keys
 
 Shortcuts you can check. Your keymap is Bend, so a key that clashes, a key the browser keeps, or a plain key that would fire while someone types **does not compile**.
