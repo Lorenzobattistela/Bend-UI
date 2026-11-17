@@ -480,6 +480,8 @@ textarea.input { display: block; width: 100%; height: auto; min-height: var(--te
 .meta { font-size: var(--role-detail); line-height: var(--leading-ui); color: var(--text-detail); margin: 0; }
 .link { color: var(--text-2); text-underline-offset: var(--space-hairline); }
 .link:hover { color: var(--text); }
+/* A link with an icon before its words (Open project folder): <a class="link link--icon">(icon)<span>…</span></a>. */
+.link--icon { display: inline-flex; align-items: center; gap: var(--space-1); border: 0; padding: 0; background: none; font: inherit; cursor: pointer; }
 .mono { font-family: var(--font-mono); }
 
 /* ---------- Text roles: the hierarchy of a screen ----------
@@ -1096,6 +1098,11 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
    (the person's bubble, the working line, a card's block) have 12 on top and bottom and --chat-box-x
    on the sides: 12, or 16 on pill. */
 .msg .block { padding: var(--space-3) var(--chat-box-x); }
+/* The card that closes a turn which changed the project (a dot, what happened, Open project folder): its
+   block sits flush, 12 above its link. <div class="block block--done">…</div><div class="actions actions--start">… */
+.msg .block--done { padding: var(--space-0); }
+.msg .block--done + .actions { margin-top: var(--space-3); }
+.actions--start { justify-content: flex-start; }
 /* A card in the chat isn't a line of a document: nothing to pick, so no hover. */
 .msg .block:hover { background: none; }
 

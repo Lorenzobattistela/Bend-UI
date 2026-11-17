@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.17 (2026-11-17)
+
+- **Done card** (the Harness Lab's "Open the project folder"): `.block--done` in a reply sits flush, with `.actions--start` 12 under it holding a `.link--icon` (an icon before the words). For the end of a turn that changed the project.
+- `.link--icon`: a link (or a button that looks like one) with an icon before its words.
+- `.actions--start`: an actions row at the start instead of the end.
+
 ## 1.1.16 (2026-11-17)
 
 - A card in the chat (`.msg .block`) has no hover: it isn't a line of a document, there is nothing to pick. The document keeps its hover.
