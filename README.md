@@ -165,6 +165,25 @@ Items can carry an icon, a `.tag`, or the check of a `menuitemradio`; `.separato
 </div>
 ```
 
+A menu can also hold a list that grows (say, what an agent was allowed to do). Put `menu--wide` on the menu and, after its items, a `.menu__section`: a `.menu__head` (a title and a `.tag` count), an optional `.menu__field` (an `.input--sm` to find in the list), a `.menu__list` and a `.menu__foot` (a `.menu__note` and a `.btn--sm`). The list shows `menu_list_rows` rows (8) and then scrolls inside the menu; the menu itself doesn't grow. A `.menu__row` isn't an item: clicking it doesn't pick or close the menu, its own button acts. It holds a `.menu__lead` (a short word, `--accent` or `--warning` for a tone), a `.menu__text` that ends in "…" when it doesn't fit (give the row a `title` with the whole text) and a ghost icon button. `.menu__empty` says when nothing matches. The field takes clicks, typing and arrow keys; the menu stays against its button when the list changes. A button can carry a `.tag` after its label, for the count.
+
+```html
+<div class="menu menu--wide menu--up" role="menu" hidden>
+  <button class="menu__item" role="menuitemradio" aria-checked="true"><span>Ask before changes</span><svg class="icon icon--sm menu__check"><use href="#i-check"/></svg></button>
+  <div class="menu__section">
+    <div class="menu__head"><span>Allowed in this chat</span><span class="tag tag--success">50</span></div>
+    <div class="menu__field"><input class="input input--sm" type="search" placeholder="Find…" aria-label="Find an allowed action"></div>
+    <div class="menu__list">
+      <div class="menu__row" title="Edit: project/index.html">
+        <span class="menu__lead menu__lead--accent">Edit</span><span class="menu__text mono">project/index.html</span>
+        <button class="btn btn--ghost btn--icon btn--sm" aria-label="Stop allowing project/index.html"><svg class="icon"><use href="#i-x"/></svg></button>
+      </div>
+    </div>
+    <div class="menu__foot"><span class="menu__note">Anything else still asks you.</span><button class="btn btn--sm">Stop allowing all</button></div>
+  </div>
+</div>
+```
+
 ## Chat
 
 A conversation that flows, with the composer fixed under the page. The agent's message is `.msg` (put `.prose` inside for Markdown); the person's is `.msg--me`.

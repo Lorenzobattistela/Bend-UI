@@ -667,8 +667,40 @@ go(ID[START] ?? "overview", false);
     check: () => radio("Title", false) + radio("Text", true) + radio("Heading", false) + '<hr class="separator">' + plain("Archive", null, true),
     tag: () => radio("Blue", false, "accent") + radio("Green", true, "success") + radio("Yellow", false, "warning") + radio("Red", false, "danger") + '<hr class="separator">' + radio("None", false, "none"),
   };
+  // List: a menu with a list that grows (50 rows here). The list scrolls inside the menu; Find… filters it,
+  // × takes one row out and the foot takes them all; the menu stays open and against its button.
+  const KINDS = { Run: "", Edit: " menu__lead--accent", Write: " menu__lead--warning" };
+  const ACTIONS = [["Run", "cd project; head -c 1500 index.html"], ["Run", "ls -la project"], ["Edit", "project/index.html"], ["Run", "cd project && bun install"], ["Write", "project/game.js"], ["Run", "cd project && bun run dev"], ["Edit", "project/game.js"], ["Run", "grep -n \"player\" project/game.js"], ["Write", "project/style.css"], ["Run", "cat project/package.json"], ["Edit", "project/style.css"], ["Run", "mkdir -p project/assets/sprites"], ["Write", "project/assets/sprites/player.svg"], ["Run", "cd project && git status"], ["Write", "project/enemy.js"], ["Run", "cd project && git add -A && git commit -m \"first enemy\""], ["Edit", "project/enemy.js"], ["Run", "wc -l project/*.js"], ["Write", "project/bullets.js"], ["Run", "cd project && bun test"], ["Edit", "project/bullets.js"], ["Run", "cp project/game.js project/game.backup.js"], ["Write", "project/levels/level1.json"], ["Run", "cat project/levels/level1.json | head -40"], ["Edit", "project/levels/level1.json"], ["Write", "project/levels/level2.json"], ["Run", "find project -name \"*.json\""], ["Write", "project/score.js"], ["Edit", "project/index.html"], ["Run", "cd project && bun run build"], ["Write", "project/sound.js"], ["Run", "ls project/assets"], ["Write", "project/assets/sfx/shoot.wav"], ["Edit", "project/sound.js"], ["Run", "cd project && bun run lint --fix"], ["Write", "project/input.js"], ["Edit", "project/input.js"], ["Run", "sed -n 1,80p project/input.js"], ["Write", "project/camera.js"], ["Edit", "project/camera.js"], ["Run", "cd project && git diff --stat"], ["Write", "project/menu.js"], ["Edit", "project/menu.js"], ["Run", "rm project/game.backup.js"], ["Write", "project/README.md"], ["Edit", "project/README.md"], ["Run", "cd project && bun run build && ls -la dist"], ["Write", "project/levels/level3.json"], ["Edit", "project/score.js"], ["Run", "cd project && git log --oneline -5"]];
+  let left = [], find = "";
+  const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
+  const row = ([kind, what], i) => `<div class="menu__row" title="${esc(kind + ": " + what)}"><span class="menu__lead${KINDS[kind]}">${kind}</span><span class="menu__text mono">${esc(what)}</span><button type="button" class="btn btn--ghost btn--icon btn--sm" data-remove="${i}" aria-label="Stop allowing ${esc(what)}" title="Stop allowing this">${icon("x")}</button></div>`;
+  const shown = () => left.map((a, i) => [a, i]).filter(([a]) => !find || (a[0] + " " + a[1]).toLowerCase().includes(find)).reverse();
+  const listBody = () => { const s = shown(); return s.length ? s.map(([a, i]) => row(a, i)).join("") : '<p class="menu__empty">Nothing allowed matches.</p>'; };
+  const count = () => find ? `${shown().length} of ${left.length}` : String(left.length);
+  const label = () => `<svg class="icon icon--sm" aria-hidden="true"><use href="#i-shield"/></svg><span>Ask before changes</span>${left.length ? `<span class="tag tag--success">${left.length} allowed</span>` : ""}<svg class="icon icon--sm" aria-hidden="true"><use href="#i-chevron-down"/></svg>`;
+  const section = () => left.length ? `<div class="menu__section"><div class="menu__head"><span>Allowed in this chat</span><span class="tag tag--success" data-count>${count()}</span></div><div class="menu__field"><input class="input input--sm" type="search" placeholder="Find…" aria-label="Find an allowed action" value="${esc(find)}"></div><div class="menu__list" data-list>${listBody()}</div><div class="menu__foot"><span class="menu__note">Anything else still asks you.</span><button type="button" class="btn btn--sm" data-clear>Stop allowing all</button></div></div>` : "";
+  sets.list = () => radio("Only read", false) + radio("Ask before changes", true) + radio("Change freely", false) + section();
+  const refresh = () => {   // the list and counts change; the field keeps its text and focus
+    trigger.innerHTML = label();
+    const list = menu.querySelector("[data-list]");
+    if (!left.length) { menu.querySelector(".menu__section")?.remove(); return; }
+    list.innerHTML = listBody();
+    menu.querySelector("[data-count]").textContent = count();
+  };
+  menu.addEventListener("input", (e) => { if (e.target.matches(".menu__field > .input")) { find = e.target.value.trim().toLowerCase(); refresh(); } });
+  menu.addEventListener("click", (e) => {
+    const x = e.target.closest("[data-remove]");
+    if (x) { left = left.filter((_, i) => i !== Number(x.dataset.remove)); refresh(); return; }
+    if (e.target.closest("[data-clear]")) { left = []; find = ""; refresh(); }
+  });
+  const plainLabel = trigger.innerHTML;
   const open = () => { if (menu.hidden) trigger.click(); };
   const draw = () => {
+    if (pick.items === "list") { left = ACTIONS.slice(); find = ""; }
+    trigger.innerHTML = pick.items === "list" ? label() : plainLabel;
+    trigger.classList.toggle("btn--ghost", pick.items === "list");
+    trigger.classList.toggle("btn--sm", pick.items === "list");
+    menu.classList.toggle("menu--wide", pick.items === "list");
     menu.innerHTML = sets[pick.items]();
     menu.classList.toggle("menu--end", pick.position === "end");
     menu.classList.toggle("menu--up", pick.position === "up");

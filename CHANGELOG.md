@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.10 (2026-11-17)
+
+- **Menu with a list**: `menu--wide` and `.menu__section` let a menu hold a list that grows under its items: `.menu__head` (title and count), `.menu__field` (find), `.menu__list`, `.menu__row` (`.menu__lead` with `--accent` and `--warning` tones, `.menu__text` that ends in "…", a remove button), `.menu__empty` and `.menu__foot` (`.menu__note` and a button). The list shows `menu_list_rows` rows (8, so `menu_list_max` is 256) and scrolls inside the menu; the menu is `menu_wide` (384) wide and a row's lead `menu_lead` (40). Rows don't pick or close the menu.
+- `ui.js`: a field inside a menu takes the click and the arrow keys, and a menu whose content changes while open is placed again, so a menu that opens up stays against its button.
+- A button can carry a `.tag` after its label.
+- Docs: Dropdown's Playground has **List**, 50 rows to find in, take out one by one, or all.
+- `LAWS.bend` and `SPEC.bend` are unchanged; no color or existing value changed.
+
 ## 1.1.9 (2026-11-09)
 
 - **Diagram shapes**: a node takes `shape`, one of Mermaid's 14 flowchart shapes by Mermaid's own name: `rect` (Process), `rounded` (Event), `stadium` (Terminal point), `fr-rect` (Subprocess), `cyl` (Database), `circle` (Start), `dbl-circ` (Stop), `odd`, `diam` (Decision), `hex` (Prepare conditional), `lean-r`, `lean-l` (Data input/output, output/input), `trap-b` (Priority action), `trap-t` (Manual operation). An unknown name is the box, with a warning. Every shape takes the five tones and both looks; in the soft look a shape keeps its outline (text-3 or its tone), so it stays 3:1 against the page.

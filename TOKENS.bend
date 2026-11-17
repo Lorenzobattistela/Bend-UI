@@ -128,6 +128,12 @@ def msg_max() -> U32: 480            # the person's message, at most this wide
 def msg_gap() -> U32: space_5()      # space between messages
 def composer_max() -> U32: 160       # the composer grows with its text up to this, then scrolls
 
+# Menu with a list: a section of rows that scrolls inside the menu
+def menu_list_rows() -> U32: 8       # the list shows this many rows, then scrolls inside the menu
+def menu_list_max() -> U32: (control_md() * menu_list_rows() : U32)
+def menu_wide() -> U32: 384          # a menu holding a list or a field is this wide
+def menu_lead() -> U32: 40           # the short word that leads a row (its kind), so the texts line up
+
 # Type
 def font_sans() -> String: "\"Inter\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif"
 def font_display() -> String: font_sans()

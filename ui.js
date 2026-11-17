@@ -48,6 +48,7 @@ const VARS = {
   "--window-margin": () => px(T.window_margin()), "--window-max": () => px(T.window_max()),
   "--agent-sm": () => px(T.agent_sm()), "--agent-lg": () => px(T.agent_lg()), "--agent-xl": () => px(T.agent_xl()),
   "--msg-max": () => px(T.msg_max()), "--msg-gap": () => px(T.msg_gap()), "--composer-max": () => px(T.composer_max()),
+  "--menu-list-max": () => px(T.menu_list_max()), "--menu-wide": () => px(T.menu_wide()), "--menu-lead": () => px(T.menu_lead()),
   "--segmented-item": () => px(T.segmented_item()), "--segmented-outer-radius": () => px(T.segmented_outer_radius()), "--segmented-inner-radius": () => px(T.segmented_inner_radius()),
   "--layer-thread": () => String(T.layer_thread()), "--layer-foot": () => String(T.layer_foot()), "--layer-dock": () => String(T.layer_dock()), "--layer-menu": () => String(T.layer_menu()),
   "--layer-side": () => String(T.layer_side()), "--layer-fly": () => String(T.layer_fly()),
@@ -320,16 +321,20 @@ function ddSet(dd, open) {
   ddButton(dd).setAttribute("aria-expanded", open);
   if (!menu.showPopover) return;   // no top layer: the menu stays where ui.css puts it
   if (!menu.hasAttribute("popover")) menu.setAttribute("popover", "manual");
-  if (open && !menu.matches(":popover-open")) menu.showPopover();
+  if (open && !menu.matches(":popover-open")) { menu.showPopover(); ddResize?.observe(menu); }
   if (!open && menu.matches(":popover-open")) menu.hidePopover();
   ddPlace(dd);
 }
+// A menu whose content changes while open (a row removed, a list filtered) changes height: place it again,
+// so a menu that opens up stays against its button.
+const ddResize = typeof ResizeObserver === "function" ? new ResizeObserver((list) => list.forEach((e) => { const dd = e.target.parentElement; if (dd?.classList.contains("dropdown") && !e.target.hidden) ddPlace(dd); })) : null;
 const ddFollow = () => document.querySelectorAll(".dropdown").forEach((dd) => ddMenu(dd) && !ddMenu(dd).hidden && ddPlace(dd));
 addEventListener("scroll", ddFollow, true);
 addEventListener("resize", ddFollow);
 const ddCloseAll = (except) => document.querySelectorAll(".dropdown").forEach((dd) => { if (dd !== except && ddMenu(dd) && !ddMenu(dd).hidden) ddSet(dd, false); });
 document.addEventListener("mousedown", (e) => {
-  if (e.target.closest(".dropdown > [aria-haspopup='menu'], .dropdown > .menu")) e.preventDefault();   // keep the caret
+  // Keep the caret, except in a field inside the menu (a list's Find…), which takes it.
+  if (e.target.closest(".dropdown > [aria-haspopup='menu'], .dropdown > .menu") && !e.target.closest("input, textarea")) e.preventDefault();
 });
 document.addEventListener("pointerdown", (e) => ddCloseAll(e.target.closest(".dropdown")));
 document.addEventListener("click", (e) => {
@@ -345,7 +350,7 @@ document.addEventListener("click", (e) => {
 document.addEventListener("keydown", (e) => {
   const dd = e.target.closest?.(".dropdown");
   if (e.key === "Escape") { const open = [...document.querySelectorAll(".dropdown")].find((d) => ddMenu(d) && !ddMenu(d).hidden); if (open) { ddSet(open, false); ddButton(open).focus(); } return; }
-  if (!dd || !["ArrowDown", "ArrowUp"].includes(e.key)) return;
+  if (!dd || !["ArrowDown", "ArrowUp"].includes(e.key) || e.target.closest(".menu__section")) return;
   e.preventDefault();
   if (ddMenu(dd).hidden) ddSet(dd, true);
   const items = [...ddMenu(dd).querySelectorAll(":scope > .menu__item:not(:disabled)")];
