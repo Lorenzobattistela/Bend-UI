@@ -1037,6 +1037,7 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .composer { flex: none; padding: var(--space-3) var(--space-5) var(--space-5); background: var(--bg); }
 [data-narrow] .composer { padding: var(--space-2) var(--space-3) var(--space-3); }
 .composer__box {
+  position: relative;          /* a .menu--up inside it (what / and @ suggest) opens above the field */
   max-width: var(--measure);
   margin: 0 auto;
   display: flex;
@@ -1095,6 +1096,8 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
    (the person's bubble, the working line, a card's block) have 12 on top and bottom and --chat-box-x
    on the sides: 12, or 16 on pill. */
 .msg .block { padding: var(--space-3) var(--chat-box-x); }
+/* A card in the chat isn't a line of a document: nothing to pick, so no hover. */
+.msg .block:hover { background: none; }
 
 /* Markdown in a reply: a heading that opens it doesn't push it down; the rest as approved in the lab. */
 .msg .prose > :first-child { margin-top: 0; }
@@ -1168,6 +1171,7 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .meter__bar { flex: 1; min-width: var(--space-8); height: var(--meter-bar); border-radius: var(--radius-full); background: var(--surface-2); overflow: hidden; }
 .meter__bar > span { display: block; height: 100%; background: var(--accent); transition: width var(--duration-enter) var(--ease); }
 .meter__value { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.composer__bar > .meter { margin-left: auto; }
 
 /* The composer's field: one box, the text and a round send button inside it, as tall as a control_lg.
    The button shows when there is text. .composer__bar sits under the box, for quiet controls (dropdowns). */

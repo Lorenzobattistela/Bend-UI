@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.16 (2026-11-17)
+
+- A card in the chat (`.msg .block`) has no hover: it isn't a line of a document, there is nothing to pick. The document keeps its hover.
+- `.composer__box` is the anchor of a `.menu--up` inside it: what / and @ suggest opens above the field, without moving it.
+- `.meter` in `.composer__bar` sits at its end.
+
 ## 1.1.15 (2026-11-17)
 
 - **Clipped code block**: `codeBlock(code, { clip: true })` shows the first `code_clip_lines` (8) lines, fading out, and a "Show 12 more lines" button that opens the rest. For a long file in a card, where the whole file would be too much.
