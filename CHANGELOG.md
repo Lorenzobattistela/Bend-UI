@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.15 (2026-11-17)
+
+- **Clipped code block**: `codeBlock(code, { clip: true })` shows the first `code_clip_lines` (8) lines, fading out, and a "Show 12 more lines" button that opens the rest. For a long file in a card, where the whole file would be too much.
+- A `.code-block` inside a `.block` sits in the text's column, under it (what an action would change).
+- Docs: the permission card in Chat > Harness parts shows it.
+
 ## 1.1.14 (2026-11-17)
 
 - `.msg__body`: a reply made of parts (what the agent did, its plan, its text, the files changed) stacks them `space_3` (12) apart. The face stays on the first line of the first part.

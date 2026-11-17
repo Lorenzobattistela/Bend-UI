@@ -47,7 +47,7 @@ const VARS = {
   "--side-padding": () => px(T.side_padding()), "--side-rail": () => px(T.side_rail()), "--side-width": () => px(T.side_width()),
   "--window-margin": () => px(T.window_margin()), "--avatar-size": () => px(T.avatar_size()), "--avatar-overlap": () => px(T.avatar_overlap()), "--avatar-ring": () => px(T.avatar_ring()), "--window-max": () => px(T.window_max()),
   "--agent-sm": () => px(T.agent_sm()), "--agent-lg": () => px(T.agent_lg()), "--agent-xl": () => px(T.agent_xl()),
-  "--msg-max": () => px(T.msg_max()), "--msg-gap": () => px(T.msg_gap()), "--composer-max": () => px(T.composer_max()), "--msg-face": () => px(T.msg_face()),
+  "--msg-max": () => px(T.msg_max()), "--msg-gap": () => px(T.msg_gap()), "--composer-max": () => px(T.composer_max()), "--code-clip-lines": () => String(T.code_clip_lines()), "--msg-face": () => px(T.msg_face()),
   "--working-dot": () => px(T.working_dot()), "--plan-node": () => px(T.plan_node()), "--meter-bar": () => px(T.meter_bar()),
   "--menu-list-max": () => px(T.menu_list_max()), "--menu-wide": () => px(T.menu_wide()), "--menu-lead": () => px(T.menu_lead()),
   "--segmented-item": () => px(T.segmented_item()), "--segmented-outer-radius": () => px(T.segmented_outer_radius()), "--segmented-inner-radius": () => px(T.segmented_inner_radius()),

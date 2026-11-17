@@ -9,9 +9,17 @@
 // A code block: a head (the file or the language, and Copy) and the code, line by line.
 //   el.innerHTML = codeBlock(code, { lang: "python", name: "laws.py", numbers: true, wrap: false });
 //   upgrade(pre)          // turns a <pre data-lang data-name> into a code block in place
+//   codeBlock(code, { clip: true })   // long code shows its first code_clip_lines (8), and "Show 12 more lines"
 // Languages: bend, js (ts, json), css, html, sh (toml, yaml), python, rust, go, sql, markdown, diff.
 
 import S from "./SYNTAX.bend";
+import T from "./TOKENS.bend";
+
+// A clipped code block opens whole when its "Show … more lines" is clicked.
+document.addEventListener("click", (e) => {
+  const more = e.target.closest(".code-block__more"); if (!more) return;
+  more.closest(".code-block").classList.remove("code-block--clip"); more.remove();
+});
 
 const CLASS = ["", "syntax__kw", "syntax__type", "syntax__str", "syntax__num", "syntax__com", "syntax__punct", "syntax__name", "syntax__add", "syntax__del"];
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
@@ -38,14 +46,16 @@ export function toLines(text, name = "bend") {
 const LANG_NAME = { bend: "Bend", js: "JavaScript", ts: "TypeScript", json: "JSON", css: "CSS", html: "HTML", sh: "Shell", bash: "Shell", toml: "TOML", yaml: "YAML", yml: "YAML", python: "Python", py: "Python", rust: "Rust", rs: "Rust", go: "Go", sql: "SQL", markdown: "Markdown", md: "Markdown", diff: "Diff" };
 const COPY_ICONS = '<svg class="icon"><use href="#i-copy"/></svg><svg class="icon"><use href="#i-check"/></svg>';
 // head: true (the default) shows the file name, or else the language; false leaves only Copy, in the corner.
-export function codeBlock(code, { lang = "bend", name, head = true, numbers = false, wrap = false } = {}) {
+export function codeBlock(code, { lang = "bend", name, head = true, numbers = false, wrap = false, clip = false } = {}) {
   const label = name || LANG_NAME[lang] || lang;
   const attr = (t) => t.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   const copy = `<button type="button" class="btn btn--plain btn--neutral btn--sm code-block__copy" data-copy="${attr(code)}" data-copied="Copied" data-reserve="Copy|Copied" aria-label="Copy the code"><span class="btn__swap" aria-hidden="true">${COPY_ICONS}</span><span class="btn__label">Copy</span></button>`;
-  const lines = toLines(code, lang).map((l) => `<span class="code-block__line">${l || " "}</span>`).join("");
-  return `<figure class="code-block syntax${numbers ? " code-block--numbers" : ""}${wrap ? " code-block--wrap" : ""}${head ? "" : " code-block--bare"}">` +
+  const all = toLines(code, lang), lines = all.map((l) => `<span class="code-block__line">${l || " "}</span>`).join("");
+  const more = clip ? all.length - T.code_clip_lines() : 0;
+  return `<figure class="code-block syntax${numbers ? " code-block--numbers" : ""}${wrap ? " code-block--wrap" : ""}${head ? "" : " code-block--bare"}${more > 0 ? " code-block--clip" : ""}">` +
     (head ? `<figcaption class="code-block__head"><span class="code-block__name">${esc(label)}</span>${copy}</figcaption>` : copy) +
-    `<pre class="code-block__pre" tabindex="0" aria-label="Code, ${attr(label)}"><code>${lines}</code></pre></figure>`;
+    `<pre class="code-block__pre" tabindex="0" aria-label="Code, ${attr(label)}"><code>${lines}</code></pre>` +
+    (more > 0 ? `<button type="button" class="btn btn--plain btn--neutral btn--sm code-block__more">Show ${more} more line${more === 1 ? "" : "s"}</button>` : "") + `</figure>`;
 }
 export function upgrade(pre) {
   const d = pre.dataset, box = document.createElement("div");

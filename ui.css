@@ -557,6 +557,9 @@ textarea.input { display: block; width: 100%; height: auto; min-height: var(--te
 .code-block--numbers .code-block__line::before { content: counter(line) / ""; display: inline-block; width: calc(var(--space-6) + var(--space-1)); padding-right: var(--space-3); text-align: right; color: var(--text-3); user-select: none; }
 .code-block--wrap .code-block__pre code { min-width: var(--space-0); }
 .code-block--wrap .code-block__line { white-space: pre-wrap; overflow-wrap: anywhere; }
+/* Clipped: the first code_clip_lines show, fading out, and a button under them opens the rest. */
+.code-block--clip .code-block__pre { max-height: calc(var(--code-clip-lines) * 1lh + var(--space-3) * 2); overflow: hidden; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
+.code-block__more { width: 100%; justify-content: center; border-radius: var(--space-0); border-top: var(--border-width) solid var(--syntax-border); }
 .code-block--wrap.code-block--numbers .code-block__line { padding-left: calc(var(--space-6) + var(--space-1) + var(--space-3)); text-indent: calc((var(--space-6) + var(--space-1) + var(--space-3)) * -1); }
 
 /* ---------- Disclosure: a section that opens and closes ----------
@@ -685,6 +688,9 @@ a.row:hover .row__title { color: var(--text-2); text-decoration: underline; text
 .block__line { display: block; }   /* one line of a block's text, for line-by-line motion (formBlock) */
 .block__out { grid-column: 2; margin: var(--space-1) 0 0; font-family: var(--font-mono); font-size: var(--text-sm); line-height: var(--leading-ui); white-space: pre-wrap; overflow-wrap: anywhere; color: var(--text-2); }
 .block__out--error { color: var(--danger-text); }
+/* A code block under a block's text (what an action would change), in the text's column. */
+.block > .code-block { grid-column: 2; margin-top: var(--space-2); }
+.block:not(:has(> .block__slot)) > .code-block { grid-column: 1; }
 
 /* ---------- Page and doc: a scrolling area with a column of blocks ----------
    <main class="page"><div class="doc">…blocks…</div></main>
