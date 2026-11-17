@@ -127,3 +127,19 @@ def fly_time() -> F32: 0.46
 
 # A frame never moves things more than max_step seconds, so a slow tab doesn't jump.
 def max_step() -> F32: 0.05
+
+# ---------- Rise: the rows of a menu come in one after another (ui.js, .menu[data-motion="rise"]) ----------
+# Each row grows from nothing to its height, so the menu's box is built row by row, and its content rises
+# rise_distance (TOKENS.bend) into place. In whole ms, so the laws can check them exactly.
+def rise_order() -> String: "up"        # undecided. "up": the bottom row first. "down": the top row first.
+def rise_stagger_ms() -> U32: 60        # undecided. A row waits this long after the one before (item_stagger).
+def rise_time_ms() -> U32: 360          # undecided. One row's time (duration_enter).
+def rise_ease() -> String: "spring"     # undecided. "spring" (ease_spring), "ease" or "in-out".
+
+# Which turn row i of n gets.
+def rise_turn_down(+i: U32, +n: U32) -> U32: i
+def rise_turn_up(+i: U32, +n: U32) -> U32: ((n - 1 : U32) - i : U32)
+# A row waits its turn times the stagger before it starts.
+def rise_delay(+turn: U32, +stagger: U32) -> U32: (turn * stagger : U32)
+# The whole menu is in place after the last turn's wait plus one row's time.
+def rise_total(+n: U32, +stagger: U32, +time: U32) -> U32: (rise_delay((n - 1 : U32), stagger) + time : U32)

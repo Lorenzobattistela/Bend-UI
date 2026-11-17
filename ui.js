@@ -45,7 +45,7 @@ const VARS = {
   "--icon-lg": () => px(T.icon_lg()), "--icon-xl": () => px(T.icon_xl()), "--icon-stroke": () => T.icon_stroke(),
   "--dot-size": () => px(T.dot_size()), "--block-min-lines": () => String(T.block_min_lines()), "--ring-offset": () => px(T.ring_offset()), "--ring-width": () => px(T.ring_width()),
   "--side-padding": () => px(T.side_padding()), "--side-rail": () => px(T.side_rail()), "--side-width": () => px(T.side_width()),
-  "--window-margin": () => px(T.window_margin()), "--window-max": () => px(T.window_max()),
+  "--window-margin": () => px(T.window_margin()), "--avatar-size": () => px(T.avatar_size()), "--avatar-overlap": () => px(T.avatar_overlap()), "--avatar-ring": () => px(T.avatar_ring()), "--window-max": () => px(T.window_max()),
   "--agent-sm": () => px(T.agent_sm()), "--agent-lg": () => px(T.agent_lg()), "--agent-xl": () => px(T.agent_xl()),
   "--msg-max": () => px(T.msg_max()), "--msg-gap": () => px(T.msg_gap()), "--composer-max": () => px(T.composer_max()),
   "--menu-list-max": () => px(T.menu_list_max()), "--menu-wide": () => px(T.menu_wide()), "--menu-lead": () => px(T.menu_lead()),
@@ -309,11 +309,34 @@ const ddButton = (dd) => dd.querySelector(':scope > [aria-haspopup="menu"]');
 function ddPlace(dd) {
   const menu = ddMenu(dd), b = ddButton(dd).getBoundingClientRect();
   if (!menu.matches(":popover-open")) return;
-  const gap = T.space_1(), h = menu.offsetHeight, w = menu.offsetWidth;
+  // While a rise builds the menu row by row, decide with its full height, not the one it has so far.
+  const gap = T.space_1(), h = Math.max(menu.offsetHeight, riseFull.get(menu) ?? 0), w = menu.offsetWidth;
   const up = menu.classList.contains("menu--up") || !!MENU.opens_up(innerHeight - b.bottom - gap, b.top - gap, h);
   const left = Math.min(Math.max(gap, menu.classList.contains("menu--end") ? b.right - w : b.left), innerWidth - w - gap);
   menu.style.left = left + "px";
-  menu.style.top = (up ? b.top - gap - h : b.bottom + gap) + "px";
+  // Opening up, the menu holds on by its bottom edge, so when it grows it grows upward, away from its button.
+  if (up) { menu.style.top = "auto"; menu.style.bottom = innerHeight - (b.top - gap) + "px"; }
+  else { menu.style.bottom = "auto"; menu.style.top = b.bottom + gap + "px"; }
+}
+// ---------- Rise: .menu[data-motion="rise"] ----------
+// The rows come in one after another (MOTION.bend: rise_order, rise_delay, rise_stagger_ms, rise_time_ms).
+// Each row grows from nothing to its height (and the gap before it), so the menu's box is built row by row;
+// what is inside the row rises rise_distance into place, cut by the row. Reduced motion: it just shows.
+const riseFull = new WeakMap();
+const riseEase = () => ({ spring: T.ease_spring(), ease: T.ease() })[MOTION.rise_ease()] ?? (getComputedStyle(document.documentElement).getPropertyValue("--ease-in-out").trim() || "ease-in-out");
+export function rise(menu) {
+  const items = [...menu.querySelectorAll(":scope > .menu__item")], n = items.length;
+  items.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));
+  riseFull.set(menu, menu.offsetHeight);
+  if (segLess.matches || !n) return;
+  const gap = parseFloat(getComputedStyle(menu).rowGap) || 0, hs = items.map((el) => el.offsetHeight);
+  const turn = MOTION.rise_order() === "down" ? MOTION.rise_turn_down : MOTION.rise_turn_up, ease = riseEase();
+  items.forEach((el, i) => {
+    const t = { duration: MOTION.rise_time_ms(), delay: MOTION.rise_delay(turn(i, n), MOTION.rise_stagger_ms()), easing: ease, fill: "backwards" };
+    el.animate([{ opacity: 0 }, { opacity: 1 }], t);
+    el.animate([{ height: "0px", marginTop: i ? -gap + "px" : "0px" }, { height: hs[i] + "px", marginTop: "0px" }], t);
+    for (const c of el.children) c.animate([{ transform: `translateY(${T.rise_distance()}px)` }, { transform: "none" }], t);
+  });
 }
 function ddSet(dd, open) {
   const menu = ddMenu(dd);
@@ -323,6 +346,7 @@ function ddSet(dd, open) {
   if (!menu.hasAttribute("popover")) menu.setAttribute("popover", "manual");
   if (open && !menu.matches(":popover-open")) { menu.showPopover(); ddResize?.observe(menu); }
   if (!open && menu.matches(":popover-open")) menu.hidePopover();
+  if (open && menu.dataset.motion === "rise") rise(menu);
   ddPlace(dd);
 }
 // A menu whose content changes while open (a row removed, a list filtered) changes height: place it again,
@@ -339,13 +363,33 @@ document.addEventListener("mousedown", (e) => {
 document.addEventListener("pointerdown", (e) => ddCloseAll(e.target.closest(".dropdown")));
 document.addEventListener("click", (e) => {
   const btn = e.target.closest(".dropdown > [aria-haspopup='menu']");
-  if (btn) { const dd = btn.parentElement; ddSet(dd, ddMenu(dd).hidden); return; }
+  if (btn) {
+    const dd = btn.parentElement;
+    if (dd.dataset.open === "hover" && e.pointerType === "mouse" && !ddMenu(dd).hidden) return;   // the hover opened it: a click keeps it
+    ddSet(dd, ddMenu(dd).hidden); return;
+  }
   const item = e.target.closest(".dropdown > .menu > .menu__item");
   if (!item || item.disabled) return;
   const dd = item.closest(".dropdown");
   if (item.getAttribute("role") === "menuitemradio") ddMenu(dd).querySelectorAll(":scope > .menu__item").forEach((i) => i.setAttribute("aria-checked", i === item));
   ddSet(dd, false);
   dd.dispatchEvent(new CustomEvent("pick", { detail: item, bubbles: true }));
+});
+// Hover: .dropdown[data-open="hover"] opens when a mouse comes over its button and closes hover_close
+// (MOTION.bend) after the mouse leaves the button and the menu, like the agent's open: "hover".
+// Touch and keyboard still open it with a tap, Enter or the arrows.
+let ddHoverT = 0;
+document.addEventListener("pointerover", (e) => {
+  const dd = e.pointerType === "mouse" && e.target.closest?.('.dropdown[data-open="hover"]');
+  if (!dd) return;
+  clearTimeout(ddHoverT);
+  if (ddMenu(dd).hidden && e.target.closest('[aria-haspopup="menu"]')) { ddCloseAll(dd); ddSet(dd, true); }
+});
+document.addEventListener("pointerout", (e) => {
+  const dd = e.pointerType === "mouse" && e.target.closest?.('.dropdown[data-open="hover"]');
+  if (!dd || dd.contains(e.relatedTarget) || ddMenu(dd).hidden) return;
+  clearTimeout(ddHoverT);
+  ddHoverT = setTimeout(() => ddSet(dd, false), MOTION.hover_close() * 1000);
 });
 document.addEventListener("keydown", (e) => {
   const dd = e.target.closest?.(".dropdown");
@@ -441,6 +485,16 @@ document.addEventListener("keydown", (e) => {
 // ---------- Buttons: what they say, hold to confirm, busy and done, copy ----------
 // announce(text): a polite live region, so what a button did is said, not only shown.
 let btnLive = null;
+// ---------- Avatar ----------
+// avatar({ name, src }): a round picture; its first letter shows until the picture loads, or if it can't.
+// avatars(people, { max }): a row of them, each over the one before; past max, a "+N".
+const escAttr = (s) => String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+export const avatar = ({ name, src }) => `<span class="avatar" title="${escAttr(name)}">${escAttr([...String(name)][0]?.toUpperCase() ?? "")}${src ? `<img src="${escAttr(src)}" alt="" loading="lazy" onerror="this.remove()">` : ""}</span>`;
+export function avatars(people, { max = Infinity } = {}) {
+  const more = people.length - max;
+  return `<span class="avatars">${people.slice(0, max).map(avatar).join("")}${more > 0 ? `<span class="avatar avatar--more">+${more}</span>` : ""}</span>`;
+}
+
 export function announce(text) {
   if (!btnLive) { btnLive = document.createElement("div"); btnLive.className = "sr-only"; btnLive.setAttribute("role", "status"); document.body.appendChild(btnLive); }
   btnLive.textContent = ""; requestAnimationFrame(() => { btnLive.textContent = text; });

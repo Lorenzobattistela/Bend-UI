@@ -99,7 +99,8 @@ import { keyLabel } from "../keys.js";
 import { highlight, codeBlock, upgrade } from "../syntax.js";
 import { mountDiagram, announce } from "../diagram.js";
 import { mountPie, mountBars, mountLine, mountArea } from "../chart.js";
-import { LAWS } from "./laws.data.js";
+import { LAWS, BOARD_VALUES } from "./laws.data.js";
+import { BOARD, initBoard, cardCheck } from "../board.js";
 import pkg from "../package.json";
 import { mountChatPattern } from "./patterns/chat.js";
 
@@ -123,6 +124,7 @@ const LAWS_OF = {
   side: ["side_rail_fits", "side_width_on_grid"],
   window: ["window_max_on_grid", "window_margin_in_scale"],
   agent: ["agent_sm_in_scale", "agent_lg_on_grid"],
+  board: BOARD_VALUES.filter((v) => v.state === "law").map((v) => `${v.key}_is_fixed`),
   diagram: ["return_arrow_meets_outline", "self_loop_meets_outline", "text_fits_inside", "circle_is_round", "no_shape_same_as_before"],
 };
 const byName = Object.fromEntries(LAWS.map((l) => [l.name, l]));
@@ -147,9 +149,10 @@ const FILES = {
   diagram: ["DIAGRAM.bend", "diagram.js", "TOKENS.bend", "ui.css"], chart: ["CHART.bend", "chart.js", "MOTION.bend", "TOKENS.bend", "ui.css"], thread: ["MOTION.bend", "thread.js", "ui.css"],
   agent: ["MOTION.bend", "agent.js", "ui.css"],
   "code-block": ["SYNTAX.bend", "syntax.js", "TOKENS.bend", "ui.css"],
-  dropdown: ["ui.js", "ui.css"],
+  dropdown: ["ui.js", "ui.css", "MOTION.bend", "MOTION_LAWS.bend"],
   responsive: ["TOKENS.bend", "AREA.bend", "ui.js", "ui.css"],
   image: ["TOKENS.bend", "ui.js", "ui.css"],
+  board: ["BOARD.bend", "BOARD_LAWS.bend", "board.css", "board.js", "board-check.js"],
 };
 // Code: the README's own snippets, so the docs and the README never disagree.
 // Each page shows the code blocks under its README heading (## or ###), colored in their own language (SYNTAX.bend).
@@ -171,7 +174,7 @@ const SNIPPETS = (() => {
 const README_OF = {
   color: "Tokens", space: "Tokens", size: "Tokens", radius: "Tokens", type: "Type: one ladder", keyboard: "Keys",
   page: "Page, doc and pair", pair: "Page, doc and pair", thread: "Thread",
-  section: "Page head and sections", dropdown: "Dropdown",
+  section: "Page head and sections", dropdown: "Dropdown", board: "Board extension (1.1.11)",
 };
 const section = (title, ...kids) => {
   const s = document.createElement("section"); s.className = "section";
@@ -322,6 +325,7 @@ function go(id, push = true) {
   here?.scrollIntoView({ block: "nearest" });
   main.scrollTop = 0;
   if (id === "chart") charts.forEach((c) => c.replay());   // the entrance plays when the page shows
+  if (id === "board") requestAnimationFrame(() => document.dispatchEvent(new Event("docs-board-shown")));   // measures need the page visible
   const url = BASE + PATH[id] + location.hash;
   if (push && location.pathname + location.search !== BASE + PATH[id]) history.pushState({ id }, "", url);
   else history.replaceState({ id }, "", url);
@@ -385,6 +389,58 @@ if (imagePreview) {
 // Responsive: the playground. The Width filter sets how wide the area is; the area decides if it is narrow.
 const areaDemo = document.getElementById("area-demo");
 if (areaDemo) document.querySelector('[data-page="responsive"] [data-filter="width"]').addEventListener("change", (e) => { areaDemo.dataset.w = e.detail.dataset.value; });
+// Board: the playground. Shape sets data-radius on the area (none = board_default_shape); the table reads BOARD.bend.
+const boardArea = document.getElementById("board-area");
+if (boardArea) {
+  document.querySelector('[data-page="board"] [data-filter="shape"]').addEventListener("change", (e) => { boardArea.dataset.radius = e.detail.dataset.value; drawBoardValues(); });
+  function drawBoardValues() {
+    const shape = boardArea.dataset.radius || BOARD.board_default_shape();
+    const card = boardArea.querySelector(".card"), lane = boardArea.querySelector(".lane");
+    // What the browser measures for each value, when it shows on the board right now.
+    const cs = getComputedStyle(card), ls = getComputedStyle(lane), hs = getComputedStyle(lane.querySelector(".lane__head")), bs = getComputedStyle(boardArea.querySelector(".board"));
+    const n = (v) => Math.round(parseFloat(v));
+    const seen = {
+      card_padding_left: cs.paddingLeft, card_padding_right: cs.paddingRight, card_padding_top: cs.paddingTop, card_padding_bottom: cs.paddingBottom,
+      card_gap: cs.rowGap, card_row: getComputedStyle(card.querySelector(".card__head")).height, card_head_gap: getComputedStyle(card.querySelector(".card__lead")).columnGap,
+      card_foot_gap: getComputedStyle(card.querySelector(".card__foot")).columnGap, card_width: card.getBoundingClientRect().width,
+      card_content_width: card.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight),
+      lane_padding_left: ls.paddingLeft, lane_padding_right: ls.paddingRight, lane_padding_top: ls.paddingTop, lane_padding_bottom: ls.paddingBottom,
+      lane_gap: ls.rowGap, lane_width: lane.getBoundingClientRect().width, lane_head_padding_left: hs.paddingLeft, lane_head_padding_right: hs.paddingRight,
+      board_padding_x: bs.paddingLeft, board_gap: bs.columnGap,
+      [`card_radius_${shape}`]: cs.borderTopLeftRadius, [`lane_radius_${shape}`]: ls.borderTopLeftRadius,
+    };
+    // The circle, measured on a done card (it always shows there): its size, and from it to the text.
+    const done = boardArea.querySelector(".card.is-done");
+    if (done) {
+      const c = done.querySelector(".card__check").getBoundingClientRect(), t = done.querySelector(".card__title");
+      seen.card_check_size = c.width;
+      seen.card_check_gap = t.getBoundingClientRect().left + parseFloat(getComputedStyle(t).paddingLeft) - c.right;
+    }
+    const tone = { law: "success", undecided: "warning", derived: "" };
+    document.getElementById("board-values").innerHTML =
+      `<div class="docs-board-row docs-board-head"><span>value</span><span>BOARD.bend</span><span>on screen</span><span>state</span></div>` +
+      BOARD_VALUES.map(({ key, state }) => {
+        const v = BOARD[key](), num = typeof v === "number", shown = num ? (v >= 999 ? "full" : v) : typeof v === "string" ? `"${v}"` : String(v === true || v?.$ === "True");
+        const m = key in seen ? (num && v >= 999 ? "full" : n(seen[key])) : "";
+        const off = key in seen && num && v < 999 && n(seen[key]) !== v;
+        return `<div class="docs-board-row"><span class="mono">${key}</span><span class="mono">${shown}</span><span class="mono${off ? " docs-board-off" : ""}">${m === "" ? "—" : m}</span><span><span class="tag${tone[state] ? " tag--" + tone[state] : ""}">${state}</span></span></div>`;
+      }).join("");
+  }
+  // The demo board drags for real: the cards stay where they land, and each lane's count follows.
+  const demo = document.getElementById("board-demo");
+  for (const [i, c] of demo.querySelectorAll(".card").entries()) c.dataset.id = "c" + i;
+  for (const l of demo.querySelectorAll(".lane")) l.dataset.lane = l.getAttribute("aria-label");
+  // Every card gets the circle to complete it; the one in Done starts done.
+  for (const c of demo.querySelectorAll(".card")) {
+    const done = c.closest(".lane").dataset.lane === "Done";
+    c.classList.toggle("is-done", done);
+    c.querySelector(".card__title").insertAdjacentHTML("afterbegin", cardCheck(done));
+  }
+  initBoard(demo, { onDrop: () => demo.querySelectorAll(".lane").forEach((l) => (l.querySelector(".lane__head .tag").textContent = l.querySelectorAll(".card").length)) });
+  requestAnimationFrame(drawBoardValues);
+  document.fonts?.ready.then(drawBoardValues);
+  document.addEventListener("docs-board-shown", drawBoardValues);
+}
 // Segmented: the playground. Shape and animation come from the filters; the three rows follow them.
 const segPreview = document.getElementById("seg-preview");
 if (segPreview) {

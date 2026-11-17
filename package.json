@@ -1,6 +1,6 @@
 {
   "name": "bend-ui",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "Design system in Bend: tokens in TOKENS.bend, rules in LAWS.bend.",
   "type": "module",
   "main": "ui.js",
@@ -25,7 +25,11 @@
     "./AREA.bend": "./AREA.bend",
     "./workspace": "./workspace.js",
     "./workspace.css": "./workspace.css",
-    "./WORKSPACE.bend": "./WORKSPACE.bend"
+    "./WORKSPACE.bend": "./WORKSPACE.bend",
+    "./board": "./board.js",
+    "./board.css": "./board.css",
+    "./BOARD.bend": "./BOARD.bend",
+    "./DRAG.bend": "./DRAG.bend"
   },
   "files": [
     "ui.js",
@@ -55,10 +59,19 @@
     "workspace.css",
     "WORKSPACE.bend",
     "WORKSPACE_LAWS.bend",
-    "WORKSPACE_PROOF.bend"
+    "WORKSPACE_PROOF.bend",
+    "board.js",
+    "board.css",
+    "board-check.js",
+    "BOARD.bend",
+    "BOARD_LAWS.bend",
+    "BOARD_PROOF.bend",
+    "DRAG.bend",
+    "MOTION_LAWS.bend",
+    "MOTION_PROOF.bend"
   ],
   "scripts": {
-    "check": "bend PROOF.bend",
+    "check": "bend PROOF.bend && bun board-check.js",
     "docs": "bun docs/read-laws.js && cd docs && bun index.html",
     "site": "bun docs/read-laws.js && rm -rf site && bend docs/index.html -o site && cp docs/404.html site/404.html"
   }

@@ -711,3 +711,23 @@ Read [`AGENTS.md`](AGENTS.md). `LAWS.bend` and `SPEC.bend` change only with the 
 ## Workspace extension (1.0.7)
 
 See [the needs register](docs/BORZOI-NEEDS.md) for every Borzoi requirement and the [component review artifact](docs/workspace.html). Import `bend-ui/workspace` to opt in. Existing components and owner laws are unchanged.
+
+## Board extension (1.1.11)
+
+`import "bend-ui/board"` adds the board, lane and card. Their measures live in `BOARD.bend`; the locked ones are pinned in `BOARD_LAWS.bend`, the rest are marked `# undecided`. `board.js` writes every number as a CSS variable and exports `card` (what a card shows and in which order) `cardCheck(done)` (the circle that completes a card: put it first inside `.card__title`) and `initBoard(board, { canDrag, onDrop, onDone })`: clicking the circle marks the card `is-done` where it is and calls `onDone(id, done)`; cards drag with a mouse, a pen or a finger, the others slide to make room, and the card settles with `MOTION.bend`'s spring; `DRAG.bend` decides when a press becomes a drag and where the card lands. Markup:
+
+```html
+<div class="board">
+  <section class="lane">
+    <header class="lane__head"><h2 class="group-title">Doing</h2><span class="tag">2</span></header>
+    <div class="lane__cards">
+      <article class="card">
+        <div class="card__head"><span class="card__lead"><span class="tag tag--mono">VK-1</span><span class="tag tag--accent">ui</span></span></div>
+        <p class="text card__title">${cardCheck(false)}Title</p>
+        <div class="card__foot"><span class="detail card__who">@isa</span></div>
+      </article>
+    </div>
+  </section>
+</div>
+```
+

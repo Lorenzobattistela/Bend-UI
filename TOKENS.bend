@@ -134,6 +134,14 @@ def menu_list_max() -> U32: (control_md() * menu_list_rows() : U32)
 def menu_wide() -> U32: 384          # a menu holding a list or a field is this wide
 def menu_lead() -> U32: 40           # the short word that leads a row (its kind), so the texts line up
 
+# Avatar: a person's picture (GitHub's), round. In a row of avatars each one goes over the one before by
+# avatar_overlap, and a ring in the surface color around each keeps them apart.
+def avatar_size() -> U32: icon_lg()          # undecided
+def avatar_overlap() -> U32: space_1()       # undecided
+def avatar_ring() -> U32: space_hairline()   # undecided
+# Rise (MOTION.bend): how far below its place a menu row starts.
+def rise_distance() -> U32: space_2()        # undecided
+
 # Type
 def font_sans() -> String: "\"Inter\", ui-sans-serif, system-ui, -apple-system, \"Segoe UI\", sans-serif"
 def font_display() -> String: font_sans()
