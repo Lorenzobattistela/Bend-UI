@@ -11,3 +11,6 @@ def L.card_foot_align_is_fixed(): {==}
 def L.card_foot_order_is_fixed(): {==}
 def L.card_foot_gap_is_fixed(): {==}
 def L.card_check_gap_is_fixed(): {==}
+def L.card_dialog_grows_down(): {==}
+def L.card_dialog_moves_up_at_bottom(): {==}
+def L.card_dialog_keeps_top_gap(): {==}

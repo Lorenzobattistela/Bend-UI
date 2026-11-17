@@ -12,7 +12,7 @@ const local = new Set([...css.matchAll(/(--[a-z-]+)\s*:/g), ...js.matchAll(/setP
 const errors = [], used = new Set();
 for (const m of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
   const sel = m[1].trim();
-  if (!/(^|\s|,)\.(board|lane|card)(?![a-z-])/.test(sel)) continue;
+  if (!/(^|\s|,)\.(board|lane|card|card-dialog)(?![a-z-])/.test(sel)) continue;
   for (const d of m[2].split(";")) {
     const v = d.trim(); if (!v) continue;
     if (/var\(--space-/.test(v)) errors.push(`${sel} { ${v} }: --space-* used directly. Add a value to BOARD.bend.`);

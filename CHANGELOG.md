@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.12 (2026-11-17)
+
+- **Open card**: `cardDialog(dialog)` turns a `<dialog class="dialog">` into the dialog a card opens into (`.card-dialog`): a head, a `.card-dialog__body` with the title and notes as `.card-dialog__field` (textareas with no box of their own) and a `.card-dialog__data` row, and `.actions` under it. It opens `card_dialog_open_top` (64) from the top and `card_dialog_open_height` (60dvh) tall, its rows rising in with the menu's rise. Typing past its height, it grows down, moves up when it touches the bottom and stops at the top; only then its middle scrolls, and the head, the buttons and the padding at the bottom never scroll. `BOARD.bend` has its measures (all undecided) and `card_dialog_top`, the rule of where it sits, with three laws in `BOARD_LAWS.bend`. A field shows it can be edited by `card_dialog_editable` ("tint": the ghost button's hover background, `card_dialog_edit_pad` past the text; also "line" and "cursor"; undecided). Escape and a click outside close it.
+- **Board head**: `.board__head` above a `.board`, the board's name on the left and things for it on the right; a `.separator` right after it is the line under it. `BOARD.bend`: `board_head_padding_y` (12) and `board_head_gap` (8), both undecided. Docs: on the Board page, with its measures.
+- **New card**: `newCard(placeholder, label)` is a `.card` holding a `.card__field`, a textarea with no box of its own that writes in the title's role, so the field is the card. `fitField(field)` keeps it as tall as its text. `formCard(card, from)` grows a new card from the field's height to its own, and its rows rise into it one after another, with the menu's rise values (`MOTION.bend`, undecided). Docs: Add card on the Board page.
+- `theme()`: a font can give its `weight` range (`"100 900"` for a variable font), so 500 and 600 use the font's own weights.
+
 ## 1.1.11 (2026-11-17)
 
 - **Board (opt-in)**: `import "bend-ui/board"` adds the board (lanes side by side, scrolling sideways), the lane (`lane__head` with title and count, `lane__cards`, `lane__add`) and the card (`card__head`, `card__lead`, `card__title`, `card__foot`), with drag states (`is-over`, `is-dragging`, `is-before`). Existing components keep their definitions and appearance.

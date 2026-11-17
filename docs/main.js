@@ -100,7 +100,7 @@ import { highlight, codeBlock, upgrade } from "../syntax.js";
 import { mountDiagram, announce } from "../diagram.js";
 import { mountPie, mountBars, mountLine, mountArea } from "../chart.js";
 import { LAWS, BOARD_VALUES } from "./laws.data.js";
-import { BOARD, initBoard, cardCheck } from "../board.js";
+import { BOARD, initBoard, cardCheck, newCard, fitField, formCard } from "../board.js";
 import pkg from "../package.json";
 import { mountChatPattern } from "./patterns/chat.js";
 
@@ -407,6 +407,7 @@ if (boardArea) {
       lane_padding_left: ls.paddingLeft, lane_padding_right: ls.paddingRight, lane_padding_top: ls.paddingTop, lane_padding_bottom: ls.paddingBottom,
       lane_gap: ls.rowGap, lane_width: lane.getBoundingClientRect().width, lane_head_padding_left: hs.paddingLeft, lane_head_padding_right: hs.paddingRight,
       board_padding_x: bs.paddingLeft, board_gap: bs.columnGap,
+      board_head_padding_y: getComputedStyle(boardArea.querySelector(".board__head")).paddingTop, board_head_gap: getComputedStyle(boardArea.querySelector(".board__head")).columnGap,
       [`card_radius_${shape}`]: cs.borderTopLeftRadius, [`lane_radius_${shape}`]: ls.borderTopLeftRadius,
     };
     // The circle, measured on a done card (it always shows there): its size, and from it to the text.
@@ -437,6 +438,28 @@ if (boardArea) {
     c.querySelector(".card__title").insertAdjacentHTML("afterbegin", cardCheck(done));
   }
   initBoard(demo, { onDrop: () => demo.querySelectorAll(".lane").forEach((l) => (l.querySelector(".lane__head .tag").textContent = l.querySelectorAll(".card").length)) });
+  // Add card: the field is the card itself (newCard); Enter grows it into a card (formCard), Escape leaves.
+  let seq = 100;
+  demo.addEventListener("click", (e) => {
+    const add = e.target.closest(".lane__add .btn"); if (!add) return;
+    const box = add.parentElement, button = box.innerHTML;
+    box.innerHTML = newCard("Card title", "New card");
+    const field = box.querySelector(".card__field"); fitField(field); field.focus();
+    let closed = false;
+    const finish = (save) => {
+      if (closed) return; closed = true;
+      const t = field.value.trim(), from = box.firstElementChild.offsetHeight, lane = box.closest(".lane");
+      box.innerHTML = button;
+      if (!save || !t) return;
+      const list = lane.querySelector(".lane__cards"), id = "VK-" + seq++;
+      list.insertAdjacentHTML("beforeend", `<article class="card" tabindex="0" data-id="${id}"><div class="card__head"><span class="card__lead"><span class="tag tag--mono">${id}</span><span class="tag tag--accent">ui</span></span></div><p class="text card__title">${cardCheck(false)}</p><div class="card__foot"><span class="detail card__who">@isa</span></div></article>`);
+      list.lastElementChild.querySelector(".card__title").append(t);
+      lane.querySelector(".lane__head .tag").textContent = list.children.length;
+      formCard(list.lastElementChild, from);
+    };
+    field.addEventListener("keydown", (k) => { if (k.key === "Enter") { k.preventDefault(); finish(true); } if (k.key === "Escape") finish(false); });
+    field.addEventListener("blur", () => finish(true));
+  });
   requestAnimationFrame(drawBoardValues);
   document.fonts?.ready.then(drawBoardValues);
   document.addEventListener("docs-board-shown", drawBoardValues);

@@ -618,7 +618,7 @@ export function theme(t = {}) {
       const font = typeof v === "string" ? { family: v } : v;
       if (font.src) {
         const style = document.createElement("style");
-        style.textContent = `@font-face { font-family: "${font.family}"; src: url("${font.src}"); font-display: swap; }`;
+        style.textContent = `@font-face { font-family: "${font.family}"; src: url("${font.src}");${font.weight ? ` font-weight: ${font.weight};` : ""} font-display: swap; }`;
         document.head.appendChild(style);
       }
       own.light[FONT_KEYS[k]] = `"${font.family}", ${T.font_sans()}`;

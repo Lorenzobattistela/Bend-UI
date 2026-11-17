@@ -5,6 +5,7 @@ import "./board.css";
 import B from "./BOARD.bend";
 import D from "./DRAG.bend";
 import M from "./MOTION.bend";
+import T from "./TOKENS.bend";
 
 const px = (n) => n + "px";
 const root = document.documentElement.style;
@@ -182,4 +183,84 @@ export function initBoard(board, { canDrag = () => true, onDrop = () => {}, onDo
   board.addEventListener("pointercancel", drop);
   // While a drag runs, the page doesn't scroll or select text under the finger.
   board.addEventListener("touchmove", (e) => { if (drag) e.preventDefault(); }, { passive: false });
+}
+
+// ---------- A new card: the field becomes the card ----------
+// newCard(placeholder, label) is the markup: a .card with a .card__field (a textarea) that grows with its text.
+// fitField(field) keeps the field as tall as its text. formCard(card, from) grows a card just put in place from
+// `from` px (the field's height) to its own height, and its rows rise rise_distance into it one after another, with
+// the menu's rise (MOTION.bend: rise_time_ms, rise_stagger_ms, rise_ease). Reduced motion: it just shows.
+export const newCard = (placeholder = "", label = placeholder) =>
+  `<div class="card"><textarea class="card__field ${attr(B.card_title_role())}" rows="1" placeholder="${attr(placeholder)}" aria-label="${attr(label)}"></textarea></div>`;
+export function fitField(field) {
+  const fit = () => { field.style.height = "auto"; field.style.height = px(field.scrollHeight); };
+  field.addEventListener("input", fit); fit();
+}
+const formEase = () => ({ spring: T.ease_spring(), ease: T.ease() })[M.rise_ease()] ?? (getComputedStyle(document.documentElement).getPropertyValue("--ease-in-out").trim() || "ease-in-out");
+export function formCard(card, from) {
+  if (still.matches || !card) return;
+  const t = { duration: M.rise_time_ms(), easing: formEase() }, h = card.offsetHeight;
+  card.style.overflow = "hidden";
+  card.animate([{ height: px(from) }, { height: px(h) }], t).finished.finally(() => (card.style.overflow = ""));
+  [...card.children].forEach((row, i) => row.animate([{ opacity: 0, transform: `translateY(${px(T.rise_distance())})` }, { opacity: 1, transform: "none" }], { ...t, delay: i * M.rise_stagger_ms(), fill: "backwards" }));
+}
+
+// ---------- Open card: the dialog a card opens into ----------
+// cardDialog(dialog) turns a <dialog class="dialog"> into the open card (board.css: .card-dialog). Its open() shows it
+// card_dialog_open_top from the top of the screen and its rows rise in one after another (MOTION.bend's rise); the
+// textareas (.card-dialog__field) keep as tall as their text (fitField), and the box follows: it grows down, moves up when
+// it touches the bottom and stops at the top (BOARD.bend: card_dialog_top); only then its middle scrolls. close() fades it
+// out. Escape and a click outside close it too. Reduced motion: it just shows.
+export function cardDialog(dialog) {
+  dialog.classList.add("card-dialog");
+  dialog.dataset.edit = B.card_dialog_editable();
+  root.setProperty("--card-dialog-open-height", B.card_dialog_open_height());
+  let last = 0, busy = false;
+  const gap = () => T.dialog_screen_gap();
+  const place = (animate) => {
+    if (!dialog.open) return;
+    const run = dialog.getAnimations().find((a) => a.id === "grow");
+    let fromH = last, fromTop = parseFloat(dialog.style.top) || B.card_dialog_open_top();
+    if (run) { const r = dialog.getBoundingClientRect(); fromH = r.height; fromTop = r.top; run.cancel(); }
+    const h = dialog.offsetHeight, top = B.card_dialog_top(B.card_dialog_open_top(), innerHeight, gap(), Math.ceil(h));
+    dialog.style.top = px(top); last = h;
+    dialog.classList.toggle("is-full", h >= innerHeight - 2 * gap() - 0.5);
+    if (!animate || busy || still.matches || (Math.abs(h - fromH) < 0.5 && Math.abs(top - fromTop) < 0.5)) return;
+    dialog.classList.add("is-growing");
+    const a = dialog.animate([{ height: px(fromH), top: px(fromTop) }, { height: px(h), top: px(top) }], { duration: M.rise_time_ms(), easing: formEase() });
+    a.id = "grow";
+    a.finished.catch(() => {}).then(() => { if (!dialog.getAnimations().some((x) => x.id === "grow")) dialog.classList.remove("is-growing"); });
+  };
+  const close = () => {
+    if (!dialog.open) return Promise.resolve();
+    dialog.getAnimations().forEach((a) => a.cancel());
+    if (still.matches) { dialog.close(); return Promise.resolve(); }
+    return dialog.animate([{ opacity: 1 }, { opacity: 0 }], { duration: T.duration_ms(), easing: T.ease() }).finished.then(() => dialog.close(), () => dialog.close());
+  };
+  dialog.addEventListener("input", (e) => { if (e.target.matches?.(".card-dialog__field")) place(true); });
+  dialog.addEventListener("cancel", (e) => { e.preventDefault(); close(); });
+  dialog.addEventListener("click", (e) => {
+    if (e.target !== dialog) return;   // a click on the backdrop lands on the dialog itself, outside its box
+    const r = dialog.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) close();
+  });
+  addEventListener("resize", () => place(false));
+  return {
+    open() {
+      dialog.getAnimations().forEach((a) => a.cancel());
+      dialog.style.top = px(B.card_dialog_open_top());
+      if (!dialog.open) dialog.showModal();
+      dialog.querySelectorAll(".card-dialog__field").forEach(fitField);
+      place(false);
+      if (still.matches) return;
+      busy = true;
+      const t = { duration: M.rise_time_ms(), easing: formEase() }, h = dialog.offsetHeight;
+      const body = dialog.querySelector(".card-dialog__body");
+      const rows = [...dialog.children].flatMap((c) => (c === body ? [...c.children] : [c]));
+      const list = [dialog.animate([{ height: px(T.control_xl()), minHeight: "0px", opacity: 0 }, { height: px(h), minHeight: "0px", opacity: 1 }], t)];
+      rows.forEach((row, i) => list.push(row.animate([{ opacity: 0, transform: `translateY(${px(T.rise_distance())})` }, { opacity: 1, transform: "none" }], { ...t, delay: i * M.rise_stagger_ms(), fill: "backwards" })));
+      Promise.all(list.map((a) => a.finished.catch(() => {}))).then(() => { list.forEach((a) => a.cancel()); busy = false; place(false); });
+    },
+    close,
+  };
 }

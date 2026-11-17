@@ -54,6 +54,8 @@ theme({
 });
 ```
 
+A variable font gives its weight range, so 500 and 600 use its own weights instead of a faked bold: `fontSans: { family: "Allo", src: allo, weight: "100 900" }`.
+
 Light is the default, always. Dark is a warm near-black: `theme({ mode: "dark" })`, or `mode: "system"` to follow the computer (`"light"` goes back). It sets `data-theme` and `color-scheme` on `<html>`; `currentTheme()` says which one shows. The accent, danger, success and warning are the same in both: as fills, borders, charts, the focus ring and the agent they need 3:1, and on black they have it. Only grounds, text and words in a tone change: links and tinted labels read `--accent-text`, error messages `--danger-text` (in light, the tone itself). Every dark value is in `TOKENS.bend` (`dark_*`), each the gentlest that passes AA.
 
 Colors at the top of `theme()` are for light, and for dark wherever dark keeps the same color. Give dark its own with `dark`. An app with its own accent gives its dark text tone and tint:

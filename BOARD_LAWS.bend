@@ -43,3 +43,15 @@ law card_foot_gap_is_fixed:
 # LAW: card_check_gap is 12.
 law card_check_gap_is_fixed:
   {U32.is_eq(B.card_check_gap(), 12) == True{} : Bool}
+
+# LAW: with room below, the open card stays where it opened and grows down.
+law card_dialog_grows_down:
+  {U32.is_eq(B.card_dialog_top(64, 800, 16, 400), 64) == True{} : Bool}
+
+# LAW: touching the bottom, it moves up just enough to keep the gap there.
+law card_dialog_moves_up_at_bottom:
+  {U32.is_eq(B.card_dialog_top(64, 800, 16, 740), 44) == True{} : Bool}
+
+# LAW: taller than the screen, it stops at the gap at the top (and its middle scrolls).
+law card_dialog_keeps_top_gap:
+  {U32.is_eq(B.card_dialog_top(64, 800, 16, 900), 16) == True{} : Bool}

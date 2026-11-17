@@ -17,6 +17,11 @@
 [data-radius="rounded"] .board { --board-card-radius: var(--card-radius-rounded); --board-lane-radius: var(--lane-radius-rounded); }
 [data-radius="pill"] .board { --board-card-radius: var(--card-radius-pill); --board-lane-radius: var(--lane-radius-pill); }
 
+/* Board head: the board's name on the left, things for it on the right. A .separator right after it is the line under it,
+   with the board's side padding. */
+.board__head { display: flex; align-items: center; gap: var(--board-head-gap); padding: var(--board-head-padding-y) var(--board-padding-x); }
+.board__head + .separator { margin: 0 var(--board-padding-x) var(--board-head-padding-y); }
+
 /* ---------- Lane ---------- */
 .lane {
   display: flex;
@@ -53,6 +58,12 @@
 }
 .card:hover { box-shadow: inset 0 0 0 var(--border-width) var(--border-strong); }
 .card:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-width) var(--accent), 0 0 0 var(--focus-halo) var(--accent-soft); }
+/* A new card while it is typed (opt-in): a .card with a .card__field inside. The field has no box of its own:
+   the card is the field, so its sides are the card's sides. It writes in the title's role (card_title_role). formCard (board.js) grows it into the card. */
+.card:has(> .card__field) { cursor: text; }
+.card:has(> .card__field:focus) { box-shadow: inset 0 0 0 var(--border-width) var(--accent), 0 0 0 var(--focus-halo) var(--accent-soft); }
+.card__field { display: block; width: 100%; border: 0; padding: 0; margin: 0; background: none; color: var(--text); font: inherit; line-height: inherit; resize: none; outline: none; overflow: hidden; }
+.card__field::placeholder { color: var(--text-2); }
 /* Drag (board.js + DRAG.bend): the card lifts with the lib's drag shadow, a slot holds its place, the others slide. */
 .card.is-lifted { z-index: var(--layer-fly); box-shadow: inset 0 0 0 var(--border-width) var(--border-strong), var(--shadow-drop); cursor: grabbing; pointer-events: none; }
 .is-board-dragging, .is-board-dragging * { cursor: grabbing; user-select: none; -webkit-user-select: none; }
@@ -94,3 +105,34 @@
 .card.is-done .card__check.is-just > .icon { animation: btn-pop var(--duration-enter) var(--ease-spring); }
 .card.is-done .card__title { color: var(--text-detail); }
 @media (prefers-reduced-motion: reduce) { .card__title, .card__check { transition: none; } .card__check.is-just *, .card__check.is-just > .icon { animation: none; } }
+
+/* ---------- Open card: the dialog a card opens into ----------
+   <dialog class="dialog"> + cardDialog(dialog) (board.js). It opens card_dialog_open_top from the top of the screen and
+   card_dialog_open_height tall, its rows rising in one after another (the menu's rise). Its notes fill it; past that, it
+   grows down with the text, moves up when it touches the bottom, and only its middle scrolls, once it reaches the top.
+   The head and the buttons never scroll, so the padding at the bottom stays.
+     <header class="dialog__header">…</header>
+     <div class="card-dialog__body"><textarea class="card-dialog__field card-dialog__title">…<div class="card-dialog__data">…
+       <textarea class="card-dialog__field card-dialog__notes">…</div>
+     <div class="actions">…</div> */
+.card-dialog.dialog { position: fixed; inset: 0 0 auto; top: var(--card-dialog-open-top); margin: 0 auto; width: min(var(--measure), 100% - 2 * var(--dialog-screen-gap)); max-width: none; max-height: calc(100dvh - 2 * var(--dialog-screen-gap)); min-height: min(var(--card-dialog-open-height), 100dvh - 2 * var(--dialog-screen-gap)); padding: var(--card-dialog-padding); overflow: hidden; }
+.card-dialog.dialog[open] { display: flex; flex-direction: column; }
+.card-dialog > .dialog__header { flex: none; margin-bottom: var(--card-dialog-head-gap); gap: var(--card-dialog-head-item-gap); }
+.card-dialog__body { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; margin-bottom: var(--card-dialog-foot-gap); overflow: visible; }
+.card-dialog.is-full .card-dialog__body { overflow-y: auto; overscroll-behavior: contain; }
+.card-dialog.is-growing .card-dialog__body { overflow-y: hidden; }
+.card-dialog__body > * { flex-shrink: 0; }
+.card-dialog > .actions { flex: none; gap: var(--card-dialog-actions-gap); }
+.card-dialog__field { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--radius-sm); background: none; font: inherit; line-height: var(--leading-body); color: var(--text); outline: none; resize: none; overflow: hidden; cursor: text; transition: background var(--duration) var(--ease), box-shadow var(--duration) var(--ease); }
+.card-dialog__field::placeholder { color: var(--text-3); }
+.card-dialog__title { margin-bottom: var(--card-dialog-title-gap); font-family: var(--font-display); font-size: var(--text-xl); font-weight: var(--weight-semibold); line-height: var(--leading-ui); }
+.card-dialog__data { display: flex; flex-wrap: wrap; align-items: center; gap: var(--card-dialog-data-gap); margin-bottom: var(--card-dialog-notes-gap); }
+.card-dialog__data .btn { gap: var(--card-dialog-data-gap); }
+.card-dialog__data .btn .icon { color: var(--text-3); }
+.card-dialog__notes { flex: 1 0 auto; color: var(--text-2); }
+/* How a field shows it can be edited (card_dialog_editable). "tint": the .btn--ghost hover background, card_dialog_edit_pad
+   past the text without moving it. "line": the .input's border that far out, and the .input's focus. "cursor": only the text cursor. */
+.card-dialog[data-edit="tint"] .card-dialog__field:is(:hover, :focus) { background: var(--surface-2); box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface-2); }
+.card-dialog[data-edit="line"] .card-dialog__field:hover { box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width)) var(--text-3); }
+.card-dialog[data-edit="line"] .card-dialog__field:focus { box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width)) var(--accent), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width) + var(--focus-halo)) var(--accent-soft); }
+@media (prefers-reduced-motion: reduce) { .card-dialog__field { transition: none; } }

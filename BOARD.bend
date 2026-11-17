@@ -45,6 +45,28 @@ def lane_head_padding_right() -> U32: T.space_3()  # undecided
 # Board
 def board_padding_x() -> U32: T.space_5()  # undecided
 def board_gap() -> U32: T.space_5()  # undecided
+def board_head_padding_y() -> U32: T.space_3()  # undecided
+def board_head_gap() -> U32: T.space_2()  # undecided
+
+# Open card: the dialog a card opens into (the "ficha"). Values from the Cartão aberto editor; none locked yet.
+def card_dialog_padding() -> U32: T.space_4()  # undecided
+def card_dialog_head_gap() -> U32: T.space_4()  # undecided
+def card_dialog_head_item_gap() -> U32: T.space_4()  # undecided
+def card_dialog_title_gap() -> U32: T.space_3()  # undecided
+def card_dialog_data_gap() -> U32: T.space_1()  # undecided
+def card_dialog_notes_gap() -> U32: T.space_4()  # undecided
+def card_dialog_foot_gap() -> U32: T.space_4()  # undecided
+def card_dialog_actions_gap() -> U32: T.space_4()  # undecided
+def card_dialog_open_top() -> U32: T.space_8()  # undecided
+def card_dialog_open_height() -> String: "60dvh"  # undecided. How tall it opens: a share of the screen's height.
+def card_dialog_edit_pad() -> U32: T.space_1()  # undecided
+def card_dialog_editable() -> String: "tint"  # undecided. How a field shows it can be edited: "cursor", "tint" or "line".
+
+# Where the open card sits, px from the top of the screen. It opens `open` down and grows down with its text;
+# when it touches the bottom (gap from the edge) it moves up; it never goes above `gap`. Past that, its middle scrolls.
+# In whole px. The height counts up to the screen less both gaps, so nothing goes below zero.
+def card_dialog_top(+open: U32, +screen: U32, +gap: U32, +h: U32) -> U32:
+  U32.max(gap, U32.min(open, ((screen - gap : U32) - U32.min(h, ((screen - gap : U32) - gap : U32)) : U32)))
 
 # Derived: the card grows outward with its sides, so a padding never squeezes the content.
 def card_width() -> U32: ((card_content_width() + card_padding_left() : U32) + card_padding_right() : U32)
