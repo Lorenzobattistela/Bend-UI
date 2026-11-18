@@ -9,6 +9,7 @@ Two additions for the chat, from the look approved in the "LawEditor Chat Compos
 - `details.turn__more`: a row that opens (an action's output), its chevron turning; `.turn__more--flat` folds a finished turn's work into one line that opens to a turn inside the turn.
 - The face stays on the middle of its turn's first line, also when that line is small.
 - **The question that waits** (`.ask`, `.ask__title`): drawn in the message box's place in `.composer`, so where the person answers is where it asks. It never grows past three composers; what it shows scrolls inside it.
+- A code block or a note inside `.ask` follows the chat's own shape (`--chat-card-radius`, no width limit); `.ask` draws no outline when it takes the focus (its border and halo say it); an open row keeps 4 clear of the row after it.
 - No new tokens: every value is an existing one.
 - Docs: Chat page, A turn.
 

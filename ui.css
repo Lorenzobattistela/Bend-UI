@@ -1233,6 +1233,7 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .turn__more[open] > summary .turn__mark > .icon { transform: rotate(90deg); }
 .turn__more > :not(summary) { margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2)); }
 .turn__more--flat > :not(summary) { margin: var(--space-2) 0 0; }
+.turn__more[open]:not(.turn__more--flat):not(:last-child) { margin-bottom: var(--space-1); }   /* what it shows keeps clear of the next row */
 @media (prefers-reduced-motion: reduce) { .turn__more > summary .turn__mark > .icon { transition: none; } }
 /* The face stays on the middle of its turn's first line, also when that line is small. */
 .msg--face:has(> .msg__face + .turn > :is(.turn__row--sm, .turn__group, .turn__more):first-child) > .msg__face { margin-top: calc((var(--text-sm) * var(--leading-ui) - var(--text-lg) * var(--leading-body)) / 2); }
@@ -1243,7 +1244,10 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
    <div class="turn__actions">(buttons)</div></div></div></div><div class="composer__bar">…</div></form>
    It never grows past three composers: what it shows scrolls inside it. */
 .ask { max-width: var(--measure); max-height: calc(var(--composer-max) * 3); overflow-y: auto; margin: 0 auto; padding: var(--space-3); border: var(--border-width) solid var(--accent); border-radius: var(--chat-box-radius); background: var(--surface); box-shadow: 0 0 0 var(--focus-halo) var(--accent-soft); }
+.ask:focus-visible { outline: none; }   /* its own border and halo already say it holds the focus */
 .ask .turn__main { gap: var(--space-3); }
+.ask .code-block { margin: 0; border-radius: var(--chat-card-radius); }
+.ask .prose { max-width: none; }
 .ask__title { font-weight: var(--weight-medium); color: var(--text); overflow-wrap: anywhere; }
 
 /* How much of the context is used: a label, a bar, the value. */
