@@ -321,6 +321,9 @@ textarea.input { display: block; width: 100%; height: auto; min-height: var(--te
 }
 .menu__item > span { flex: 1; }
 .menu__item:hover, .menu__item:focus-visible { background: var(--surface-2); color: var(--text); outline: none; }
+/* A choice made with the arrow keys in a list that doesn't take the focus (a composer's suggestions: the caret
+   stays in the text). <button class="menu__item" role="option" aria-selected="true"> */
+.menu__item[aria-selected="true"] { background: var(--surface-2); color: var(--text); }
 .menu__item[aria-checked="true"] { color: var(--text); }
 .menu__item:disabled { opacity: var(--disabled-opacity); cursor: default; }
 .menu__check { visibility: hidden; color: var(--accent); }
@@ -678,6 +681,8 @@ a.row:hover .row__title { color: var(--text-2); text-decoration: underline; text
 }
 .block:hover { background: var(--surface-2); }
 .block[aria-selected="true"] { background: var(--accent-soft); box-shadow: inset 0 0 0 var(--border-width) var(--accent); }
+/* A block that is only read (a list of laws, a result): there is nothing to pick, so it has no hover. */
+.block--still:hover { background: none; }
 .block__slot { height: calc(var(--text-lg) * var(--leading-body)); display: flex; align-items: center; }
 /* A block without its dot has no dot column: the text starts at the left. */
 .block:not(:has(> .block__slot)) { grid-template-columns: minmax(0, 1fr); }
@@ -1340,6 +1345,8 @@ html:not([data-narrow]) .window:not(.is-full) {
   box-shadow: inset 0 calc(var(--agent-face) * -0.06) calc(var(--agent-face) * 0.14) rgb(0 0 0 / .22), var(--shadow-float);
 }
 .agent__face:focus-visible { outline: var(--focus-width) solid var(--accent); outline-offset: var(--focus-offset-round); }
+/* A face that only looks (beside a chat's reply): it opens nothing, so it isn't a control. */
+.agent--still .agent__face { cursor: default; }
 .agent__eye { position: absolute; width: 13%; height: 26%; border-radius: var(--radius-full); background: var(--accent-fg); will-change: transform; }
 .agent__item { position: absolute; left: 50%; top: 50%; z-index: var(--layer-part-top); opacity: 0; pointer-events: none; box-shadow: var(--shadow-float); }
 .agent.is-open .agent__item { pointer-events: auto; }

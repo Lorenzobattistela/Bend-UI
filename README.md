@@ -440,6 +440,8 @@ Brand marks for AI options are in `brand/` (`claude.webp`, `openai.svg`); see `b
 
 `setItem(id, { status, label, pressed, disabled })`, `open()`, `close()`, `spin()`, `shake()`, `lookAtEl(el)`, `ask(true)`, `flash(id)`. `flyBetween(rect, toAgent)` moves the face from one agent to another.
 
+`still: true` is a face that only looks (beside a chat's reply): it opens nothing, so it takes no focus, has no pointer cursor, and screen readers skip it.
+
 ## Components
 
 The markup of each piece. The docs show these same snippets on each piece's page.

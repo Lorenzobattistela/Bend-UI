@@ -32,8 +32,12 @@ export function mountAgent(root, opts = {}) {
   const iconCls = size === "lg" ? "icon icon--lg" : "icon";
 
   root.classList.add("agent", "agent--" + size);
+  // still: a face that only looks. It opens nothing, so it takes no focus and screen readers skip it.
+  root.classList.toggle("agent--still", !!opts.still);
   root.innerHTML =
-    `<button class="agent__face" aria-label="${opts.label || "Agent"}" aria-expanded="false"><i class="agent__eye"></i><i class="agent__eye"></i></button>` +
+    (opts.still
+      ? `<button class="agent__face" tabindex="-1" aria-hidden="true"><i class="agent__eye"></i><i class="agent__eye"></i></button>`
+      : `<button class="agent__face" aria-label="${opts.label || "Agent"}" aria-expanded="false"><i class="agent__eye"></i><i class="agent__eye"></i></button>`) +
     (opts.items || []).map((it) =>
       `<button class="${btn} agent__item" data-id="${it.id}" aria-label="${it.label}" tabindex="-1">` +
         (it.ring ? RING : "") +
@@ -57,7 +61,7 @@ export function mountAgent(root, opts = {}) {
   function setOpen(v) {
     s.isOpen = v;
     root.classList.toggle("is-open", v);
-    face.setAttribute("aria-expanded", v);
+    if (!opts.still) face.setAttribute("aria-expanded", v);
     items.forEach((b) => b.tabIndex = v ? 0 : -1);
     if (!v) root.classList.remove("is-asking");
   }
@@ -95,7 +99,7 @@ export function mountAgent(root, opts = {}) {
   let lastPointer = "", closeT;
   root.addEventListener("pointerdown", (e) => { lastPointer = e.pointerType; }, true);
   root.addEventListener("keydown", () => { lastPointer = ""; }, true);
-  face.addEventListener("click", () => { if (byHover && lastPointer === "mouse") setOpen(true); else s.toggle(); });
+  face.addEventListener("click", () => { if (opts.still) return; if (byHover && lastPointer === "mouse") setOpen(true); else s.toggle(); });
   root.addEventListener("pointerenter", (e) => {
     s.hover = true;
     if (byHover && e.pointerType === "mouse") { clearTimeout(closeT); setOpen(true); }
