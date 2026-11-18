@@ -157,7 +157,7 @@
      </div>
    A checklist's row holds an <input class="card-dialog__field card-item__text">, and its head an
    <input class="card-dialog__field card-piece__name">. A relation's row starts with a .card-item__mark (an icon;
-   --warning while it holds the card, --success once it no longer does) in place of the circle. */
+   --warning while it holds the card, --success once it no longer does, --danger while the card holds it) in place of the circle. */
 .card-dialog__lead { display: inline-flex; align-items: center; gap: var(--card-dialog-data-gap); min-width: 0; }
 .card-dialog__data > .card-dialog__add { margin-left: auto; }
 .card-dialog__body > .card-dialog__notes:has(~ .card-dialog__pieces) { flex: 0 0 auto; }
@@ -185,6 +185,7 @@
 .card-item__mark { flex: none; width: var(--card-check-size); height: var(--card-check-size); display: grid; place-items: center; color: var(--text-3); }
 .card-item__mark--warning { color: var(--warning-text); }
 .card-item__mark--success { color: var(--success-text); }
+.card-item__mark--danger { color: var(--danger-text); }
 /* A row's actions show while the row is under the pointer or holds the focus (always, where nothing hovers). */
 .card-item__more { flex: none; opacity: 0; transition: opacity var(--duration) var(--ease); }
 .card-item__row:is(:hover, :focus-within) > .card-item__more, .card-item__more:has(.menu:not([hidden])) { opacity: 1; }

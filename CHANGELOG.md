@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.25 (2026-11-18)
+
+- `.card-item__mark--danger`: the icon at the start of a row in the lib's red, for a card this one is holding back. Beside `--warning` and `--success`; with a `.tag--danger` for the count in the block's head, the block calls for attention. Only adds.
+
 ## 1.1.24 (2026-11-18)
 
 What gets added to an open card, from the look approved in the "Subtask e bloqueio" artifact. Only adds: nothing that exists changes.
