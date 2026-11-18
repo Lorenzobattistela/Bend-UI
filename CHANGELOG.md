@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.1.24 (2026-11-18)
+
+What gets added to an open card, from the look approved in the "Subtask e bloqueio" artifact. Only adds: nothing that exists changes.
+
+- **The one way in** (`board.css`): `.card-dialog__add` at the end of `.card-dialog__data` sits at the right end of the row, so the row holds only what every card has. `.card-dialog__lead` groups what sits beside the id in the head.
+- **Pieces** (`board.css`): `.card-dialog__pieces` under the notes holds a `.card-piece` for each thing added: a block on `surface-2` with a `.card-piece__head` (a line under it) and a `.card-list` of `.card-item` rows. A row is a card (`.card-item__link`: its id and title) or a line of text (`.card-item__text`); a level inside a row is a `.card-list` inside its `.card-item`. `.card-item__mark` (`--warning`, `--success`) is an icon where the circle would be; `.card-item__more` shows a row's actions on hover or focus. `.card-add` is the line that adds a row, with `.card-add__keys` under it for the keys that work there.
+- **The circle outside a card** (`board.js`): `itemCheck(done, { labels, just })` is the card's own circle, always shown, for a row of a list. The row's `.card-item` takes `.is-done`; `just` draws the green ring once.
+- **A count on the card's face**: `.card__count` at the start of `.card__foot`; the rest of the foot keeps its end.
+- `BOARD.bend`: `card_piece_padding` (12), `card_piece_gap` (4), `card_piece_radius` (6), `card_pieces_gap` (12), `card_item_row` (24) and `card_item_gap` (12), all undecided; `card_item_indent` is derived (the circle and its gap). `board-check.js` holds the new rules to the same contract.
+- `.menu__item > .tag` keeps its size (a card's id before its title in a menu).
+- Icons: `tag`.
+- Docs: Board page, "What gets added to an open card".
+
 ## 1.1.23 (2026-11-18)
 
 A piece can leave and arrive without crossing the screen, from the look approved in the "Concluir e ir pro Feito" artifact. Only adds: nothing that exists changes.

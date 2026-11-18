@@ -62,11 +62,23 @@ def card_dialog_open_height() -> String: "60dvh"  # undecided. How tall it opens
 def card_dialog_edit_pad() -> U32: T.space_1()  # undecided
 def card_dialog_editable() -> String: "tint"  # undecided. How a field shows it can be edited: "cursor", "tint" or "line".
 
+# Open card: pieces. What gets added to a card (its sub-cards, a checklist, the cards it waits for) is a block under its
+# notes, with a list of rows. Values from the "Subtask e bloqueio" artifact, where they borrowed the card's own; none locked yet.
+def card_piece_padding() -> U32: T.space_3()  # undecided
+def card_piece_gap() -> U32: T.space_1()  # undecided
+def card_piece_radius() -> U32: T.radius_md()  # undecided
+def card_pieces_gap() -> U32: T.space_3()  # undecided
+def card_item_row() -> U32: T.control_sm()  # undecided
+def card_item_gap() -> U32: T.space_3()  # undecided
+
 # Where the open card sits, px from the top of the screen. It opens `open` down and grows down with its text;
 # when it touches the bottom (gap from the edge) it moves up; it never goes above `gap`. Past that, its middle scrolls.
 # In whole px. The height counts up to the screen less both gaps, so nothing goes below zero.
 def card_dialog_top(+open: U32, +screen: U32, +gap: U32, +h: U32) -> U32:
   U32.max(gap, U32.min(open, ((screen - gap : U32) - U32.min(h, ((screen - gap : U32) - gap : U32)) : U32)))
+
+# Derived: a level inside a list starts under the text of the level above (past the circle and its gap).
+def card_item_indent() -> U32: ((card_check_size() + card_item_gap() : U32))
 
 # Derived: the card grows outward with its sides, so a padding never squeezes the content.
 def card_width() -> U32: ((card_content_width() + card_padding_left() : U32) + card_padding_right() : U32)

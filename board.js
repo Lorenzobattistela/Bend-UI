@@ -51,6 +51,15 @@ export function setDone(card, done, labels = checkLabels) {
   b.nextElementSibling.textContent = done ? L.unmark : L.mark;
 }
 
+// The circle in a row of a list (the open card's pieces, board.css: .card-item): the card's own circle, always shown.
+// itemCheck(done, { labels, just }) is the markup: put it first in a .card-item__row, and give the row's .card-item
+// .is-done when done. just: it became done now, so the green ring draws once.
+export function itemCheck(done, { labels = checkLabels, just = false } = {}) {
+  const L = { ...checkLabels, ...labels }, say = done ? L.unmark : L.mark;
+  return `<button class="card__check${just ? " is-just" : ""}" type="button" aria-pressed="${!!done}" aria-label="${attr(say)}">` +
+    `<svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><svg class="status-ring" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" pathLength="100"/></svg></button>`;
+}
+
 // ---------- Drag: pick a card up, the others make room, it settles where it lands ----------
 // DRAG.bend decides (when a press becomes a drag, where the card lands, when a spring has settled);
 // MOTION.bend's spring moves everything. This file only measures, and draws what they return.

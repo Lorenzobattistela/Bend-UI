@@ -670,6 +670,6 @@ export const icons = [
   "ellipsis", "ellipsis-vertical", "trash-2", "pencil", "copy", "external-link", "download", "upload", "refresh-cw",
   "undo-2", "redo-2", "link", "filter", "grip-vertical", "settings", "lock-open", "eye", "eye-off",
   "info", "circle-alert", "circle-x", "star", "bell", "folder", "user", "calendar", "house",
-  "image",
+  "image", "tag",
 ];
 export const tokens = T;

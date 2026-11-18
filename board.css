@@ -136,3 +136,72 @@
 .card-dialog[data-edit="line"] .card-dialog__field:hover { box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width)) var(--text-3); }
 .card-dialog[data-edit="line"] .card-dialog__field:focus { box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width)) var(--accent), 0 0 0 calc(var(--card-dialog-edit-pad) + var(--border-width) + var(--focus-halo)) var(--accent-soft); }
 @media (prefers-reduced-motion: reduce) { .card-dialog__field { transition: none; } }
+
+/* ---------- Open card: what gets added to it ----------
+   The row under the title (.card-dialog__data) holds what every card has; a .card-dialog__add at its end is the one way
+   in for the rest. .card-dialog__lead groups what sits beside the id in the head. Each thing added (sub-cards, a
+   checklist, the cards it waits for) is a .card-piece under the notes: a block with a head and a .card-list of rows.
+   A row's circle is the card's own (board.js: itemCheck); a level inside a row is a .card-list inside its .card-item.
+     <div class="card-dialog__pieces">
+       <section class="card-piece">
+         <header class="card-piece__head"><h3 class="group-title">Subtasks</h3><span class="tag">1/3</span></header>
+         <ul class="card-list">
+           <li class="card-item"><div class="card-item__row">(itemCheck)
+             <button class="card-item__link"><span class="tag tag--mono">VK-7</span><span class="card-item__title">…</span></button>
+             <span class="tag">Doing</span><div class="dropdown card-item__more">…</div></div>
+             <ul class="card-list">…the level inside…</ul></li>
+         </ul>
+         <div class="card-add"><div class="card-item__row"><span class="card-add__mark">(plus)</span>
+           <input class="card-dialog__field card-add__field"></div><p class="detail card-add__keys">…</p></div>
+       </section>
+     </div>
+   A checklist's row holds an <input class="card-dialog__field card-item__text">, and its head an
+   <input class="card-dialog__field card-piece__name">. A relation's row starts with a .card-item__mark (an icon;
+   --warning while it holds the card, --success once it no longer does) in place of the circle. */
+.card-dialog__lead { display: inline-flex; align-items: center; gap: var(--card-dialog-data-gap); min-width: 0; }
+.card-dialog__data > .card-dialog__add { margin-left: auto; }
+.card-dialog__body > .card-dialog__notes:has(~ .card-dialog__pieces) { flex: 0 0 auto; }
+.card-dialog__pieces { display: flex; flex-direction: column; gap: var(--card-pieces-gap); margin-top: var(--card-dialog-notes-gap); }
+.card-piece { display: flex; flex-direction: column; gap: var(--card-piece-gap); padding: var(--card-piece-padding); background: var(--surface-2); border-radius: var(--card-piece-radius); }
+.card-piece > :is(.btn, .dropdown) { align-self: flex-start; }
+.card-piece__head { display: flex; align-items: center; gap: var(--card-head-gap); min-height: var(--card-item-row); padding-bottom: var(--card-piece-gap); border-bottom: var(--border-width) solid var(--border); }
+.card-piece__head > .group-title { margin: 0; }
+.card-piece__head > .dropdown { margin-left: auto; }
+.card-piece .card-piece__name { width: auto; min-width: 0; field-sizing: content; height: var(--card-item-row); font-size: var(--role-group); font-weight: var(--weight-semibold); line-height: var(--leading-tight); }
+/* On the block's ground, a plain tag and a field under the pointer take the card's own surface, so they still read. */
+.card-piece .tag:not([class*="tag--"]), .card-piece .tag--mono { background: var(--surface); }
+.card-dialog[data-edit="tint"] .card-piece .card-dialog__field:is(:hover, :focus) { background: var(--surface); box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface); }
+.card-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--card-piece-gap); }
+.card-list .card-list { padding-left: var(--card-item-indent); margin-top: var(--card-piece-gap); }
+.card-item__row { display: flex; align-items: center; gap: var(--card-item-gap); min-height: var(--card-item-row); }
+.card-item__row > :is(.tag, .avatars) { flex: none; }
+.card-item__link { all: unset; box-sizing: border-box; flex: 1; min-width: 0; display: flex; align-items: center; gap: var(--card-piece-gap); cursor: pointer; border-radius: var(--radius-sm); }
+.card-item__link > .tag { flex: none; white-space: nowrap; }
+.card-item__link:hover .card-item__title { text-decoration: underline; text-underline-offset: var(--underline-offset); }
+.card-item__link:focus-visible { outline: var(--focus-width) solid var(--accent); outline-offset: var(--focus-offset); }
+.card-item__title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-item__text { flex: 1; min-width: 0; height: var(--card-item-row); }
+.card-item.is-done > .card-item__row :is(.card-item__title, .card-item__text) { color: var(--text-detail); }
+.card-item__mark { flex: none; width: var(--card-check-size); height: var(--card-check-size); display: grid; place-items: center; color: var(--text-3); }
+.card-item__mark--warning { color: var(--warning-text); }
+.card-item__mark--success { color: var(--success-text); }
+/* A row's actions show while the row is under the pointer or holds the focus (always, where nothing hovers). */
+.card-item__more { flex: none; opacity: 0; transition: opacity var(--duration) var(--ease); }
+.card-item__row:is(:hover, :focus-within) > .card-item__more, .card-item__more:has(.menu:not([hidden])) { opacity: 1; }
+@media (hover: none) { .card-item__more { opacity: 1; } }
+/* The circle outside a card: always there, the same green, ring and check (the row's .card-item takes .is-done). */
+.card-item__row > .card__check { opacity: 1; transform: none; }
+.card-item.is-done > .card-item__row > .card__check { border-color: var(--success); background: var(--success); }
+.card-item.is-done > .card-item__row > .card__check > .icon { opacity: 1; transform: none; }
+.card-item.is-done > .card-item__row > .card__check.is-just .status-ring { animation: card-ring-out calc(var(--duration) * 5) var(--ease) both; }
+.card-item.is-done > .card-item__row > .card__check.is-just .status-ring circle { stroke: var(--success); stroke-dasharray: 100; animation: bend-ring-draw calc(var(--duration) * 5) var(--ease) both; }
+.card-item.is-done > .card-item__row > .card__check.is-just > .icon { animation: btn-pop var(--duration-enter) var(--ease-spring); }
+/* The line that adds a row: a plus where the circle would be, a field with no box, and under it the keys that work there. */
+.card-add { display: flex; flex-direction: column; gap: var(--card-piece-gap); }
+.card-add__mark { flex: none; width: var(--card-check-size); height: var(--card-check-size); display: grid; place-items: center; color: var(--text-3); }
+.card-add__field { flex: 1; min-width: 0; height: var(--card-item-row); }
+.card-add__keys { display: flex; flex-wrap: wrap; align-items: center; gap: var(--card-piece-gap) var(--card-item-gap); min-height: var(--card-item-row); margin: 0; padding-left: var(--card-item-indent); }
+.card-add__keys > span { display: inline-flex; align-items: center; gap: var(--card-piece-gap); }
+/* On the card's face: a count at the start of the foot (sub-cards and checklist rows done). The rest of the foot keeps its end. */
+.card__foot > .card__count { margin-right: auto; font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .card-item__more { transition: none; } .card-item__row > .card__check.is-just *, .card-item__row > .card__check.is-just > .icon { animation: none; } }

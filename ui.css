@@ -332,6 +332,8 @@ textarea.input { display: block; width: 100%; height: auto; min-height: var(--te
 .menu[data-motion="rise"] > .menu__item { flex: none; overflow: hidden; }
 /* A button can carry a .tag after its label (a count, say): it sits in the button's own gap. */
 .btn > .tag { flex: none; }
+/* So can a menu item, before its label (a card's id): the tag keeps its size and the label takes the room. */
+.menu__item > .tag { flex: none; }
 
 /* A menu with a list: items on top, then a .menu__section that holds a head, an optional field, a list
    that scrolls inside the menu (--menu-list-max: menu_list_rows rows of control-md) and a foot.
