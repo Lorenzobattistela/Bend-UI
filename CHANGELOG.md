@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.18 (2026-11-17)
+
+- Side bar: a long name in a button (a conversation's title) ends in "…" instead of being cut at the bar's edge.
+
 ## 1.1.17 (2026-11-17)
 
 - **Done card** (the Harness Lab's "Open the project folder"): `.block--done` in a reply sits flush, with `.actions--start` 12 under it holding a `.link--icon` (an icon before the words). For the end of a turn that changed the project.

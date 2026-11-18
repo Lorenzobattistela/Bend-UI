@@ -1274,6 +1274,8 @@ html:not([data-narrow]) .window:not(.is-full) {
 .side__head { display: flex; align-items: center; gap: var(--space-1); margin-bottom: var(--space-2); }
 .side__label { margin: 0; padding: var(--space-3) var(--space-2) var(--space-1); font: inherit; font-size: var(--role-detail); line-height: var(--leading-ui); color: var(--text-2); white-space: nowrap; }   /* text-2: 6.58:1 (AA) */
 .side__text { transition: opacity var(--duration); }
+/* A long name (a conversation's title) ends in "…" instead of being cut at the bar's edge. */
+.side .btn > .side__text { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
 .side:not(.is-open) .side__text { opacity: 0; }
 [data-narrow] .side {
   position: absolute; z-index: var(--layer-side); top: 0; bottom: 0; left: 0;
