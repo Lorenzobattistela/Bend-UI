@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.27 (2026-11-18)
+
+- `.card-piece--danger` follows the lib's own danger blocks (`.form__summary`, an error `.feedback`): the soft red as its ground and the red as its edge, its title and icons in the red that reads as text. 1.1.26 filled the block with the solid red, which nothing else in the lib does.
+
 ## 1.1.26 (2026-11-18)
 
 - `.card-piece--danger`: a block of an open card on the lib's red, for what calls for attention (the cards this one is holding back). Its title, rows and plain buttons take the color that reads on red; its tags stay on the card's surface. Only adds.
