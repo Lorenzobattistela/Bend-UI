@@ -670,7 +670,7 @@ Row actions: wrap an item (or a section's toggle) in a `.side__row` with a `.dro
 |---|---|
 | Components | `page`, `doc`, `pair`, `thread` + `node`, `chat` + `msg` + `composer`, `disclosure`, `form`, `link`, `dropdown` + `menu`, `btn` (`--primary`, `--ghost`, `--sm`, `--lg`, `--icon`, `--round`, `:disabled`, `[aria-current]`), `input`, `field`, `segmented` (`--icons`), `panel`, `toolbar`, `tag`, `kbd`, `icon`, `rows`/`row`, `art`, `dot`, `status-ring`, `block`, `prose`, `side`, `window`, `agent`, `diagram`, `chart` |
 | Text | `display`, `heading`, `lead`, `text`, `list`, `meta`, `mono` |
-| Icons | plus, arrow-up, shield, github, file-text, scale, triangle-alert, circle-check, x, chevron-down, list, code, wand-sparkles, search, panel-left, book-open, lock, minimize-2, maximize-2, minimize, maximize, text, rows-2, columns-2, heading-1, pilcrow, check |
+| Icons | plus, arrow-up, shield, github, file-text, scale, triangle-alert, circle-check, x, chevron-down, list, code, wand-sparkles, search, panel-left, book-open, lock, minimize-2, maximize-2, minimize, maximize, text, rows-2, columns-2, heading-1, pilcrow, check, terminal, panel-right, panel-bottom |
 | Tokens | space, radius, type, controls, icons, image, status, side bar, window, agent, chat, chart, motion, color (light theme) |
 
 See everything: https://isabellaherman.github.io/Bend-UI/ (or `bun run docs`). After changing the docs, `bun run site` rebuilds `site/`; pushing it publishes the page.
@@ -735,3 +735,108 @@ See [the needs register](docs/BORZOI-NEEDS.md) for every Borzoi requirement and 
 </div>
 ```
 
+## Panes extension (1.1.20)
+
+`import "bend-ui/panes"` adds panes beside and under a window's main column, a file tree, a terminal surface and a strip. Existing components keep their definitions and appearance: a window without `.window__body` is as before. The measures live in `PANES.bend`, all marked `# undecided` (no law yet); `panes.js` writes each as a CSS variable. The logic is Bend: `PANES.bend` bounds a pane's size, `TREE.bend` makes the rows and decides the keys, `TERM.bend` reads the output and the keyboard.
+
+### Panes
+
+`.window__body` goes in `.window__main` after the toolbar: a row holding `.window__col` (the page and the composer, stacked as before) and any `.pane` beside it. `.pane--under` goes last inside the column instead (a terminal). A pane has a `.pane__head` (a `.pane__title` and `.pane__actions`) and a `.pane__body` that scrolls; with `hidden` it takes no room.
+
+```html
+<div class="window__main">
+  <div class="toolbar"><button class="btn btn--ghost btn--icon" data-pane-toggle="files" aria-label="Files"><svg class="icon"><use href="#i-panel-right"/></svg></button></div>
+  <div class="window__body">
+    <div class="window__col">
+      <main class="page">…</main>
+      <form class="composer">…</form>
+      <section class="pane pane--under" id="shell" hidden>
+        <header class="pane__head"><h2 class="pane__title">Terminal</h2></header>
+        <div class="term"></div>
+      </section>
+    </div>
+    <aside class="pane" id="files">
+      <header class="pane__head">
+        <h2 class="pane__title">Files</h2>
+        <div class="pane__actions"><button class="btn btn--ghost btn--icon btn--sm" data-pane-toggle aria-label="Close files"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      </header>
+      <div class="pane__body">…</div>
+    </aside>
+  </div>
+</div>
+```
+
+```js
+import { initPane, setPane, setPaneSize } from "bend-ui/panes";
+initPane(pane, { onResize: (size) => save(size), onToggle: (open) => {} });   // adds the grip (.pane__grip)
+setPane(pane, true);       // opens or closes it; a [data-pane-toggle="id"] button does the same
+setPaneSize(pane, 320);    // a size the app kept (null: the default)
+```
+
+- **Size**: a side pane opens `pane_width` wide (256) and is never under `pane_min` (192), and the column keeps `pane_col_min` (320); a pane under the column opens `pane_under_height` tall (160), at least `pane_under_min` (96), leaving the column `pane_page_min` (128). `PANES.bend`'s `clamp_width(wanted, room)` and `clamp_height` decide.
+- **Grip**: drag the pane's inner edge with a mouse, a pen or a finger. It is a `role="separator"` that takes the focus: Left and Right (Up and Down under the column) step it by `pane_step` (16), Home and End take it to its smallest and largest, and a double click puts the default back. For any size without dragging, offer your own control and call `setPaneSize`.
+- **Narrow** (`[data-narrow]`): a side pane covers the column as a sheet. The focus goes in when it opens and back when it closes; `Escape` or its close button closes it.
+- **Motion**: a pane slides in and the column makes room (`duration_enter`, `ease`); reduced motion turns it off.
+- A `.pane__body` that holds only text needs `tabindex="0"`, so a keyboard can scroll it.
+
+### Tree
+
+File paths in, a tree out. `TREE.bend` turns the paths into rows (folders first, then files, each level by name), keeps the rows of a closed folder hidden and decides what each key does (the WAI-ARIA tree: Up, Down, Home, End, Right and Left to open, close and step in and out, Enter or Space to press; one row takes Tab).
+
+```js
+import { tree, initTree } from "bend-ui/panes";
+body.innerHTML = tree(["GDD.md", "game/game.html", "game/sprites.js"], {
+  open: ["game"],                                 // the folders that are open
+  current: "game/game.html",                      // the file open in the app
+  marks: { "game/game.html": { add: 14, del: 6 } },   // +14 −6 at the row's end
+  label: "Files",
+});
+const files = initTree(body.firstElementChild, { onOpen: (path) => {}, onToggle: (path, open) => {} });
+files.update(paths, { current, marks });          // the files changed: the open folders stay open
+```
+
+```html
+<div class="tree" role="tree" aria-label="Files">
+  <div class="tree__row" role="treeitem" aria-expanded="true" data-path="game" data-folder …><svg class="icon"><use href="#i-chevron-down"/></svg><span class="tree__name">game</span></div>
+  <div class="tree__kids" role="group">
+    <div class="tree__row" role="treeitem" aria-current="true" data-path="game/game.html" …><svg class="icon"><use href="#i-file-text"/></svg><span class="tree__name">game.html</span><span class="tree__add">+14</span><span class="tree__del">−6</span></div>
+  </div>
+</div>
+```
+
+A path ending in `/` is a folder with nothing in it. A row has a hover because it is clickable; a level sits `tree_indent` (12) in, on a hairline. A folder grows open like the side bar's sections. No paths: `tree()` returns `""`, and the app says what it wants.
+
+### Terminal
+
+A surface: the lib runs nothing. It draws the output it is given and reports what is typed.
+
+```js
+import { mountTerm } from "bend-ui/panes";
+const term = mountTerm(el, { onData: (text) => shell.write(text), label: "Terminal" });
+term.write("\x1b[32mready\x1b[0m\r\n$ ");   // output, as the process wrote it
+term.clear();
+term.focus();
+```
+
+```html
+<div class="term"></div>
+```
+
+- **Output** (`TERM.bend`: `feed(screen, text)`): `\n`, `\r` (the line is written over), `\b`, tab stops every 8, and SGR colors (reset, bold, dim, the eight colors and their bright ones); `ESC [ K` erases in the line and `ESC [ 2 J` clears. Every other escape sequence is read and dropped. It keeps `scrollback` lines (1000, undecided).
+- **Colors** are the lib's tokens: red `--danger-text`, green `--success-text`, yellow `--warning-text`, blue `--accent-text`, magenta `--syntax-type`, cyan `--syntax-number`, dim `--text-detail`, on `--syntax-bg`.
+- **Typing** (`sent`): the element takes the focus and nothing is echoed (the shell echoes). A character sends itself, Enter `\r`, Backspace `\x7f`, Tab `\t`, the arrows `ESC [ A` to `D`, Ctrl with a letter its control character (Ctrl+C `\x03`), and a paste its text with `\r` for each line break. A block caret marks the cursor while it has the focus.
+- **Leaving**: Shift+Tab, or Escape then Tab, move the focus on, so the keyboard is never held.
+- It stays at the bottom while output arrives, unless the person scrolled up. New lines are said through `announce`, once the output is still, while the terminal has the focus.
+- It fills its container; right inside a `.pane` it takes the room under the head.
+
+### Strip
+
+A thin line of state at the top of a window. Each `.strip__item` is an optional `.dot` or icon and words; the item with `.strip__end`, and what follows it, sit at the end. Static: add `role="status"` if its changes should be said.
+
+```html
+<div class="strip">
+  <span class="strip__item"><span class="dot dot--success"></span>Laws hold</span>
+  <span class="strip__item"><svg class="icon"><use href="#i-file-text"/></svg>3 files changed</span>
+  <span class="strip__item strip__end">Ask before changes</span>
+</div>
+```

@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.20 (2026-11-17)
+
+- **Panes (opt-in)**: `import "bend-ui/panes"` adds panes beside and under a window's main column, a file tree, a terminal surface and a strip, from the look approved in the Harness Lab. Existing components keep their definitions and appearance: a window without `.window__body` is as before.
+- **Pane**: `.window__body` holds `.window__col` (the page and the composer) and any `.pane` on its right (`.pane__head` with a `.pane__title` and `.pane__actions`, `.pane__body`); `.pane--under` sits under the column. `initPane(pane, { onResize, onToggle })` adds the grip (`.pane__grip`, a `role="separator"`): drag it with a mouse, a pen or a finger, or step it with the arrow keys, Home and End; a double click puts the default back. `setPane(pane, open)` and `[data-pane-toggle]` open and close it (it slides, `duration_enter`; none with reduced motion); `setPaneSize(pane, size)` sets a size the app kept. On narrow screens a side pane is a sheet over the column: the focus goes in and back, Escape closes it.
+- **Tree**: `tree(paths, { open, current, marks, label })` writes a file tree from a list of paths, and `initTree(el, { onOpen, onToggle })` runs it (`update(paths, …)` draws it again with the open folders kept). `TREE.bend` makes the rows (folders first, by name), says which show and what Up, Down, Left, Right, Home, End, Enter and Space do (the WAI-ARIA tree, one row in Tab). `marks` shows `+14` `−6` at a row's end. A folder grows open like the side bar's sections.
+- **Terminal**: `mountTerm(el, { onData })` gives `{ write, clear, focus }`. A surface, it runs nothing. `TERM.bend` folds output into lines of pieces (`\n`, `\r`, `\b`, tab stops, SGR colors, erase in line, clear; other escape sequences are dropped) and says what each key sends (`sent`, `pasted`). Colors are existing tokens. It keeps to the bottom while output arrives, shows a block caret while focused, lets Shift+Tab or Escape then Tab leave it, and says new lines through `announce`.
+- **Strip**: `.strip` with `.strip__item` and `.strip__end`, a thin line of state at the top of a window.
+- `PANES.bend` holds the measures (`pane_width` 256, `pane_min` 192, `pane_col_min` 320, `pane_under_height` 160, `pane_under_min` 96, `pane_page_min` 128, `pane_step` 16, `pane_grip` 8, `pane_layer` 10, `tree_row` 24, `tree_indent` 12, `tree_guide_gap` 4) and `clamp_width` / `clamp_height`; `TERM.bend` has `scrollback` (1000). All undecided: they show, without a law.
+- Icons: `terminal`, `panel-right`, `panel-bottom` (Lucide).
+- Docs: Panes, Tree, Terminal and Strip pages.
+
 ## 1.1.19 (2026-11-17)
 
 - Composer bar: its buttons keep their label on one line; when they don't fit, the bar wraps instead of squeezing them.

@@ -153,6 +153,8 @@ const FILES = {
   responsive: ["TOKENS.bend", "AREA.bend", "ui.js", "ui.css"],
   image: ["TOKENS.bend", "ui.js", "ui.css"],
   board: ["BOARD.bend", "BOARD_LAWS.bend", "board.css", "board.js", "board-check.js"],
+  panes: ["PANES.bend", "panes.css", "panes.js"], tree: ["TREE.bend", "PANES.bend", "panes.css", "panes.js"],
+  terminal: ["TERM.bend", "panes.css", "panes.js"], strip: ["panes.css"],
 };
 // Code: the README's own snippets, so the docs and the README never disagree.
 // Each page shows the code blocks under its README heading (## or ###), colored in their own language (SYNTAX.bend).
@@ -264,6 +266,9 @@ const LABEL = {
   ".syntax__kw · __type · __str · __num · __com · __punct · __name": "colors",
   "mountPie(el, slices)": "pie", "mountBars(el, points)": "bars", "mountLine(el, points)": "line", "mountArea(el, points)": "area",
   "replay()": "play again",
+  ".window__body · .window__col · .pane · .pane--under · .pane__head · .pane__title · .pane__actions · .pane__body · .pane__grip": "panes",
+  ".tree · .tree__row · .tree__name · .tree__kids · .tree__add · .tree__del": "tree",
+  ".term · .term__line · .term__caret": "terminal", ".strip · .strip__item · .strip__end": "strip",
 };
 const words = (s) => s.replace(/[-_]+/g, " ").trim();
 function labelOf(raw, siblings) {
@@ -791,3 +796,7 @@ go(ID[START] ?? "overview", false);
   new IntersectionObserver((list) => list.forEach((e) => { if (e.isIntersecting) open(); })).observe(dd);
   menu.innerHTML = sets.plain();
 }
+
+// Panes extension: a pane to resize, a tree to open with the keyboard, a terminal with a made-up shell; their Laws sections.
+import { mountPanesDocs } from "./panes.js";
+mountPanesDocs();
