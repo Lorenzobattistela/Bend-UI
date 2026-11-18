@@ -1213,7 +1213,9 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .composer__field:has(> .composer__chips) { flex-wrap: wrap; }
 .composer__chips { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: var(--space-1); padding: var(--space-1) var(--space-1) 0; }
 .composer__chips .tag { gap: var(--space-hairline); padding-right: var(--space-0); }
-.composer__bar { max-width: var(--measure); margin: var(--space-1) auto 0; display: flex; align-items: center; gap: var(--space-hairline); }
+.composer__bar { max-width: var(--measure); margin: var(--space-1) auto 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-hairline); }
+/* Its buttons keep their label on one line; when they don't fit, the bar wraps instead of squeezing them. */
+.composer__bar .btn { flex: none; white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
   .msg--me.is-arriving, .msg__word { animation: none; }

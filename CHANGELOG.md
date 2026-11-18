@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.19 (2026-11-17)
+
+- Composer bar: its buttons keep their label on one line; when they don't fit, the bar wraps instead of squeezing them.
+
 ## 1.1.18 (2026-11-17)
 
 - Side bar: a long name in a button (a conversation's title) ends in "…" instead of being cut at the bar's edge.
