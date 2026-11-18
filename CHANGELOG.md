@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.28 (2026-11-18)
+
+- `.card[data-tone="accent"]`: a card in the accent tone, on the accent's soft ground like `.tag--accent`. Its edge, hover and focus stay the card's. Only adds.
+- `.avatar--accent`: an avatar on the accent's soft ground with its letter in the accent that reads as text. Only adds.
+
 ## 1.1.27 (2026-11-18)
 
 - `.card-piece--danger` follows the lib's own danger blocks (`.form__summary`, an error `.feedback`): the soft red as its ground and the red as its edge, its title and icons in the red that reads as text. 1.1.26 filled the block with the solid red, which nothing else in the lib does.

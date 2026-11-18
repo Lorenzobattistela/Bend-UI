@@ -58,6 +58,8 @@
 }
 .card:hover { box-shadow: inset 0 0 0 var(--border-width) var(--border-strong); }
 .card:focus-visible { outline: none; box-shadow: inset 0 0 0 var(--border-width) var(--accent), 0 0 0 var(--focus-halo) var(--accent-soft); }
+/* A card in the accent tone (opt-in, data-tone="accent"): the accent's soft ground, like .tag--accent. Its edge, hover and focus stay the card's. */
+.card[data-tone="accent"] { background: var(--accent-soft); }
 /* A new card while it is typed (opt-in): a .card with a .card__field inside. The field has no box of its own:
    the card is the field, so its sides are the card's sides. It writes in the title's role (card_title_role). formCard (board.js) grows it into the card. */
 .card:has(> .card__field) { cursor: text; }
