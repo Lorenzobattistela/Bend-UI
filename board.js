@@ -1,6 +1,6 @@
 // Board, lane and card (opt-in): import "bend-ui/board".
 // Every number in BOARD.bend becomes a CSS variable (card_padding_left → --card-padding-left), like ui.js does with TOKENS.bend.
-import "./ui.js";
+import { squeezeOut, stretchIn } from "./ui.js";
 import "./board.css";
 import B from "./BOARD.bend";
 import D from "./DRAG.bend";
@@ -90,7 +90,8 @@ function slide(board, change) {
 
 // initBoard(board, { canDrag(card), onDrop(id, laneId, beforeId), onDone(id, done), labels }): cards drag with a mouse, a pen or a finger.
 // Cards need data-id, lanes data-lane. onDrop runs after the card has settled, when the page shows it where it landed.
-// Clicking a card's circle (cardCheck) marks it done on the page, then onDone tells the app. The card doesn't move.
+// Clicking a card's circle (cardCheck) marks it done on the page, then onDone tells the app. The card stays where it is,
+// unless the app takes it to another lane (moveCard, below).
 export function initBoard(board, { canDrag = () => true, onDrop = () => {}, onDone = () => {}, labels = checkLabels } = {}) {
   let press = null, drag = null;
   board.addEventListener("click", (e) => {
@@ -203,6 +204,42 @@ export function formCard(card, from) {
   card.style.overflow = "hidden";
   card.animate([{ height: px(from) }, { height: px(h) }], t).finished.finally(() => (card.style.overflow = ""));
   [...card.children].forEach((row, i) => row.animate([{ opacity: 0, transform: `translateY(${px(T.rise_distance())})` }, { opacity: 1, transform: "none" }], { ...t, delay: i * M.rise_stagger_ms(), fill: "backwards" }));
+}
+
+// ---------- A card changes lane without crossing the board ----------
+// moveCard(card, list, { before, wait, onSwap }) takes a card to a lane's .lane__cards: before the card `before`, or at
+// the end. It waits `wait` ms (checkTime() lets a card just completed finish its green ring), closes on its own middle
+// (ui.js: squeezeOut), the room it took closes while its new room opens, and it opens there (stretchIn). onSwap runs
+// when it changes place, so a count can follow. The board takes no clicks meanwhile. Resolves when the card is in
+// place. The same call brings it back. Reduced motion: it is just put there.
+export const checkTime = () => T.duration_ms() * 5;   // the ring a completed card draws (board.css: card-ring-out)
+// An empty box where a card was or will be: it grows or closes with the lane's gap, so the lane follows and nothing jumps.
+function room(list, place, from, to) {
+  const slot = document.createElement("div");
+  place(slot);
+  const gap = parseFloat(getComputedStyle(list).rowGap) || 0, alone = list.children.length === 1, row = B.card_row();   // an empty lane keeps card_row
+  const at = (h) => (alone ? { height: px(Math.max(h, row)), marginBottom: px(0) } : { height: px(h), marginBottom: px(h ? 0 : -gap) });
+  Object.assign(slot.style, at(from));
+  return { slot, run: () => slot.animate([at(from), at(to)], { duration: M.space_time_ms(), easing: T.ease(), fill: "forwards" }).finished.catch(() => {}) };
+}
+export async function moveCard(card, list, { before = null, wait = 0, onSwap = () => {} } = {}) {
+  const board = card.closest(".board"), from = card.parentElement;
+  const put = (el) => list.insertBefore(el, before?.parentElement === list ? before : null);
+  if (still.matches) { put(card); onSwap(); return; }
+  if (board) board.inert = true;
+  try {
+    const pause = wait + M.move_hold_ms();
+    if (pause) await new Promise((ok) => setTimeout(ok, pause));
+    if (!card.isConnected || !list.isConnected) return;   // the page drew the board again meanwhile
+    const h = card.offsetHeight;
+    await squeezeOut(card);
+    if (!card.isConnected || !list.isConnected) return;
+    const a = room(from, (s) => card.replaceWith(s), h, 0), b = room(list, put, 0, h);
+    onSwap();
+    await Promise.all([a.run(), b.run()]);
+    a.slot.remove(); b.slot.replaceWith(card);
+    await stretchIn(card);
+  } finally { if (board) board.inert = false; }
 }
 
 // ---------- Open card: the dialog a card opens into ----------

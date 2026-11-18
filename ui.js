@@ -324,7 +324,24 @@ function ddPlace(dd) {
 // Each row grows from nothing to its height (and the gap before it), so the menu's box is built row by row;
 // what is inside the row rises rise_distance into place, cut by the row. Reduced motion: it just shows.
 const riseFull = new WeakMap();
-const riseEase = () => ({ spring: T.ease_spring(), ease: T.ease() })[MOTION.rise_ease()] ?? (getComputedStyle(document.documentElement).getPropertyValue("--ease-in-out").trim() || "ease-in-out");
+// A curve by its name in MOTION.bend: "spring", "ease", "back"; anything else is in-out.
+const easeOf = (name) => ({ spring: T.ease_spring(), ease: T.ease(), back: MOTION.ease_back() })[name] ?? (getComputedStyle(document.documentElement).getPropertyValue("--ease-in-out").trim() || "ease-in-out");
+const riseEase = () => easeOf(MOTION.rise_ease());
+// ---------- Squeeze and stretch: a piece leaves by closing on its own middle, and arrives by opening from it ----------
+// squeezeOut(el) closes any piece on its vertical middle until it is gone, and leaves it closed: take it out of the
+// page, or call stretchIn(el), which opens it from there. Both resolve when done. Nothing travels, so nothing crosses
+// the screen (MOTION.bend: squeeze_time_ms, squeeze_ease, stretch_time_ms, stretch_ease). Reduced motion: nothing moves.
+export function squeezeOut(el) {
+  if (segLess.matches) return Promise.resolve();
+  const a = el.animate([{ transform: "scaleY(1)" }, { transform: "scaleY(0)" }], { duration: MOTION.squeeze_time_ms(), easing: easeOf(MOTION.squeeze_ease()), fill: "forwards" });
+  a.id = "squeeze";
+  return a.finished.catch(() => {});
+}
+export function stretchIn(el) {
+  el.getAnimations().forEach((a) => a.id === "squeeze" && a.cancel());
+  if (segLess.matches) return Promise.resolve();
+  return el.animate([{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }], { duration: MOTION.stretch_time_ms(), easing: easeOf(MOTION.stretch_ease()) }).finished.catch(() => {});
+}
 export function rise(menu) {
   const items = [...menu.querySelectorAll(":scope > .menu__item")], n = items.length;
   items.forEach((el) => el.getAnimations().forEach((a) => a.cancel()));

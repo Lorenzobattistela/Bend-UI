@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.23 (2026-11-18)
+
+A piece can leave and arrive without crossing the screen, from the look approved in the "Concluir e ir pro Feito" artifact. Only adds: nothing that exists changes.
+
+- **Squeeze and stretch** (`ui.js`): `squeezeOut(el)` closes any piece on its own vertical middle until it is gone; `stretchIn(el)` opens it from there. Both resolve when done. Reduced motion: nothing moves.
+- **A card changes lane** (`board.js`): `moveCard(card, list, { before, wait, onSwap })` takes a card to a lane's `.lane__cards`. It waits `wait` ms (`checkTime()` is the green ring of a card just completed), closes on its middle, the room it took closes while its new room opens (the lanes follow, nothing jumps, an empty lane keeps `card_row`), and it opens there. `onSwap` runs when it changes place, for counts. The board takes no clicks meanwhile. The same call brings a card back.
+- `MOTION.bend`: `squeeze_time_ms`, `stretch_time_ms`, `space_time_ms` (360) and `move_hold_ms` (0), all undecided; `ease_back`, the spring played backwards.
+- Two laws in `MOTION_LAWS.bend`, locked by the owner in the artifact: `squeeze_ease` is "back" (the piece gathers, then goes) and `stretch_ease` is "in-out".
+- Docs: Board page. Completing a card takes it to the top of Done; unmarking brings it back to where it left.
+
 ## 1.1.22 (2026-11-18)
 
 Two additions for the chat, from the look approved in the "LawEditor Chat Composition" artifact (options A and C). Nothing that exists changes: the harness parts (`.working`, `.tools`, `.plan`, `.changes`, the cards) keep their definitions and appearance. On branch `harness-panes`, not validated by the owner in the docs page yet.

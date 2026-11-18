@@ -22,3 +22,13 @@ law rise_waits_one_stagger_more:
 # LAW: a menu of 4 is in place after the last turn's wait plus one row's time.
 law rise_total_is_last_wait_plus_time:
   {U32.is_eq(M.rise_total(4, M.rise_stagger_ms(), M.rise_time_ms()), (M.rise_delay(3, M.rise_stagger_ms()) + M.rise_time_ms() : U32)) == True{} : Bool}
+
+# Laws of the squeeze and the stretch (MOTION.bend): the owner locked how a piece leaves and how it arrives.
+
+# LAW: a piece leaves gathering first: squeeze_ease is "back".
+law squeeze_ease_is_fixed:
+  {M.squeeze_ease() == "back" : String}
+
+# LAW: a piece arrives slow, fast, slow: stretch_ease is "in-out".
+law stretch_ease_is_fixed:
+  {M.stretch_ease() == "in-out" : String}

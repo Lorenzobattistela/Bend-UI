@@ -100,7 +100,7 @@ import { highlight, codeBlock, upgrade } from "../syntax.js";
 import { mountDiagram, announce } from "../diagram.js";
 import { mountPie, mountBars, mountLine, mountArea } from "../chart.js";
 import { LAWS, BOARD_VALUES } from "./laws.data.js";
-import { BOARD, initBoard, cardCheck, newCard, fitField, formCard } from "../board.js";
+import { BOARD, initBoard, cardCheck, newCard, fitField, formCard, moveCard, checkTime } from "../board.js";
 import pkg from "../package.json";
 import { mountChatPattern } from "./patterns/chat.js";
 
@@ -442,7 +442,19 @@ if (boardArea) {
     c.classList.toggle("is-done", done);
     c.querySelector(".card__title").insertAdjacentHTML("afterbegin", cardCheck(done));
   }
-  initBoard(demo, { onDrop: () => demo.querySelectorAll(".lane").forEach((l) => (l.querySelector(".lane__head .tag").textContent = l.querySelectorAll(".card").length)) });
+  // Each lane's count; `coming` is the lane a card is on its way to (it is out of the page while its room opens).
+  const counts = (coming) => demo.querySelectorAll(".lane").forEach((l) => (l.querySelector(".lane__head .tag").textContent = l.querySelectorAll(".card").length + (l.contains(coming) ? 1 : 0)));
+  // Completing a card takes it to the top of Done without crossing the board (moveCard); unmarking it brings it back
+  // to where it left. A card that is dragged afterwards stays where it was put.
+  const home = new WeakMap();
+  initBoard(demo, {
+    onDrop: (id) => { home.delete(demo.querySelector(`.card[data-id="${id}"]`)); counts(); },
+    onDone: (id, done) => {
+      const card = demo.querySelector(`.card[data-id="${id}"]`), list = card.parentElement, top = demo.querySelector('.lane[data-lane="Done"] .lane__cards');
+      if (done && list !== top) { home.set(card, { list, next: card.nextElementSibling }); moveCard(card, top, { before: top.firstElementChild, wait: checkTime(), onSwap: () => counts(top) }); }
+      else if (!done && list === top && home.has(card)) { const h = home.get(card); home.delete(card); moveCard(card, h.list, { before: h.next, onSwap: () => counts(h.list) }); }
+    },
+  });
   // Add card: the field is the card itself (newCard); Enter grows it into a card (formCard), Escape leaves.
   let seq = 100;
   demo.addEventListener("click", (e) => {

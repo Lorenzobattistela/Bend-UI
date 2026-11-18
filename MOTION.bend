@@ -143,3 +143,15 @@ def rise_turn_up(+i: U32, +n: U32) -> U32: ((n - 1 : U32) - i : U32)
 def rise_delay(+turn: U32, +stagger: U32) -> U32: (turn * stagger : U32)
 # The whole menu is in place after the last turn's wait plus one row's time.
 def rise_total(+n: U32, +stagger: U32, +time: U32) -> U32: (rise_delay((n - 1 : U32), stagger) + time : U32)
+
+# ---------- Squeeze and stretch: a piece leaves by closing on its own middle and arrives by opening from it ----------
+# (ui.js: squeezeOut, stretchIn; board.js: moveCard.) Nothing crosses the screen: the piece closes on its vertical
+# middle where it is, the room it took closes while the room it will take opens, and it opens there. In whole ms.
+def squeeze_time_ms() -> U32: 360       # undecided. The piece closing (duration_enter).
+def squeeze_ease() -> String: "back"    # "back" (ease_back: it gathers, then goes), "ease" or "in-out".
+def stretch_time_ms() -> U32: 360       # undecided. The piece opening (duration_enter).
+def stretch_ease() -> String: "in-out"  # "in-out" (slow, fast, slow), "ease" or "spring" (ease_spring).
+def space_time_ms() -> U32: 360         # undecided. The room closing where the piece left and opening where it lands.
+def move_hold_ms() -> U32: 0            # undecided. A wait before the piece starts to close.
+# ease_spring (TOKENS.bend) played backwards: the same curve, mirrored, so a piece gathers before it goes.
+def ease_back() -> String: "cubic-bezier(.36, 0, .66, -.56)"
