@@ -171,6 +171,15 @@
 /* On the block's ground, a plain tag and a field under the pointer take the card's own surface, so they still read. */
 .card-piece .tag:not([class*="tag--"]), .card-piece .tag--mono { background: var(--surface); }
 .card-dialog[data-edit="tint"] .card-piece .card-dialog__field:is(:hover, :focus) { background: var(--surface); box-shadow: 0 0 0 var(--card-dialog-edit-pad) var(--surface); }
+/* A block that calls for attention (.card-piece--danger): the lib's red as its ground, and what it holds in the color
+   that reads on red. Its tags stay on the card's surface, so they read as before; a plain button turns to the surface under the pointer. */
+.card-piece--danger { background: var(--danger); color: var(--accent-fg); }
+.card-piece--danger .card-piece__head { border-bottom-color: color-mix(in srgb, var(--accent-fg) 35%, transparent); }
+.card-piece--danger :is(.group-title, .card-piece__name, .card-item__title, .card-item__text, .card-item__mark, .card-add__mark) { color: var(--accent-fg); }
+.card-piece--danger .btn--plain.btn--neutral { color: var(--accent-fg); }
+.card-piece--danger .btn--plain.btn--neutral:hover { background: var(--surface); color: var(--danger-text); }
+/* A card's id inside a menu opened from a block keeps the tag's own ground (the menu is already on the surface). */
+.card-piece .menu .tag--mono { background: var(--surface-2); }
 .card-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--card-piece-gap); }
 .card-list .card-list { padding-left: var(--card-item-indent); margin-top: var(--card-piece-gap); }
 .card-item__row { display: flex; align-items: center; gap: var(--card-item-gap); min-height: var(--card-item-row); }

@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.1.26 (2026-11-18)
+
+- `.card-piece--danger`: a block of an open card on the lib's red, for what calls for attention (the cards this one is holding back). Its title, rows and plain buttons take the color that reads on red; its tags stay on the card's surface. Only adds.
+- A card's id inside a menu opened from a block keeps the tag's own ground.
+
 ## 1.1.25 (2026-11-18)
 
 - `.card-item__mark--danger`: the icon at the start of a row in the lib's red, for a card this one is holding back. Beside `--warning` and `--success`; with a `.tag--danger` for the count in the block's head, the block calls for attention. Only adds.
