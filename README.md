@@ -219,6 +219,66 @@ The agent's reply with its face: `<div class="msg msg--face"><div class="msg__fa
 
 Harness parts (1.1.13), each inside a reply: `.working` (what the agent does now), `.tools` with a `.tool` per action (a `.disclosure` whose summary has `.tool__kind`, `.tool__what`, `.tool__meta`, and a `.tool__out`), `.plan` with `.plan__step` (`.is-done`, `.is-now`, `.is-pop`; a `.plan__node` holding an `.node__core`, and `.plan__text`), `.changes` (`.changes__head`, then `.changes__row` with `.changes__file`, `.changes__add`, `.changes__del`). A card is a `.block` and an `.actions` row; leave out its `.block__slot` for a card without a dot. In the composer: `.composer__chips` above the text, `.composer__stop` for the send button while the agent works, and `.meter` for the context used. Chat boxes follow the shape (`data-radius`): 12 on the sides, 16 on pill.
 
+A turn (1.1.22): everything a reply is made of, on one ruler. The harness parts above each bring their own side padding, so stacked in one reply their texts start at different places. A `.turn` puts them in rows of two columns, a mark and the text, so every line of text of a reply starts at the same place. The distances say who belongs to whom: 4 inside a `.turn__group`, 12 between the groups of a turn, the chat's own gap between turns.
+
+```html
+<div class="msg msg--face"><div class="msg__face"><div></div></div><div class="turn">
+  <div class="turn__group">
+    <div class="turn__row turn__row--sm">
+      <div class="turn__mark"><span class="plan__step is-now"><span class="plan__node"><i class="node__core"></i></span></span></div>
+      <div class="turn__main"><span class="turn__step is-now">Write the page</span></div>
+    </div>
+  </div>
+  <div class="turn__group">
+    <details class="turn__more">
+      <summary class="turn__row turn__row--sm">
+        <span class="turn__mark"><svg class="icon"><use href="#i-chevron-right"/></svg></span>
+        <span class="turn__main"><span class="turn__line">
+          <span class="tool__kind">Read</span><span class="tool__what mono">GDD.md</span><span class="tool__meta">5 lines</span>
+        </span></span>
+      </summary>
+      <pre class="turn__out"># Pet</pre>
+    </details>
+  </div>
+  <div class="turn__row"><div class="turn__mark"></div><div class="turn__main"><div class="prose">…</div></div></div>
+  <div class="turn__row turn__row--sm">
+    <div class="turn__mark"><span class="dot dot--success"></span></div>
+    <div class="turn__main"><div class="turn__line turn__line--wrap">
+      <span class="turn__strong">1 file changed</span>
+      <span class="turn__file"><span class="mono">index.html</span><span class="changes__add">+166</span></span>
+      <button class="link link--icon turn__end" type="button"><svg class="icon icon--sm"><use href="#i-folder"/></svg><span>Open folder</span></button>
+    </div></div>
+  </div>
+</div></div>
+```
+
+- `.turn__row` is what the person reads (the reply, a question, a rule); `.turn__row--sm` is a line of work, in small text; `.turn__row--tight` keeps a sentence (`.turn__text`) and the `.turn__note` under it together (`.turn__note--error` when it failed).
+- `.turn__mark` holds a plan node, a chevron, a dot or an icon (`--success`, `--warning` color an icon), or stays empty; `.turn__main` holds the text.
+- `.turn__line` is one line of parts (`.tool__kind`, `.tool__what`, `.tool__meta`, `.working__verb`); `.turn__line--wrap` lets them wrap; `.turn__end` goes to the line's right end. `.turn__step` is a plan step's text (`.is-now`, `.is-done`), `.turn__label` a group's name ("Rules heard"), `.turn__strong` the words that count, `.turn__file` a file and its numbers, `.turn__actions` a row of buttons at the end.
+- `details.turn__more` is a row that opens: its summary is the row, with a `chevron-right` in its mark, and what it shows (`.turn__out`, `.turn__out--error`) starts at the text column. `.turn__more--flat` shows rows of the turn itself, from the mark column: a finished turn folds its work into one line ("Worked for 48s · 2 actions") holding a `.turn` of the same groups.
+
+The question that waits (`.ask`) takes the message box's place, so where the person answers is where it asks. It never grows past three composers: what it shows scrolls inside it.
+
+```html
+<form class="composer">
+  <div class="ask"><div class="turn__row">
+    <div class="turn__mark"><span class="dot dot--warning"></span></div>
+    <div class="turn__main">
+      <span class="ask__title">Allow the chat to write index.html?</span>
+      …a code block (codeBlock(code, { clip: true })), a note…
+      <div class="turn__actions">
+        <button class="btn btn--sm btn--bordered" type="button">Don't allow</button>
+        <button class="btn btn--sm btn--bordered" type="button">Allow for this session</button>
+        <button class="btn btn--sm btn--primary" type="button">Allow</button>
+      </div>
+    </div>
+  </div></div>
+  <div class="composer__bar">…</div>
+</form>
+```
+
+Use a turn when a reply stacks more than its text (a plan, actions, what it does now, what changed), and `.ask` when the chat can't go on without an answer. Both only add: `.working`, `.tools`, `.plan`, `.changes` and the cards stay as they are, and a reply that uses them looks as before.
+
 ## Keys
 
 Shortcuts you can check. Your keymap is Bend, so a key that clashes, a key the browser keeps, or a plain key that would fire while someone types **does not compile**.

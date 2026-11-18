@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.22 (2026-11-18)
+
+Two additions for the chat, from the look approved in the "LawEditor Chat Composition" artifact (options A and C). Nothing that exists changes: the harness parts (`.working`, `.tools`, `.plan`, `.changes`, the cards) keep their definitions and appearance. On branch `harness-panes`, not validated by the owner in the docs page yet.
+
+- **A turn** (`.turn`): everything a reply is made of, on one ruler. The harness parts each bring their own side padding, so stacked in one reply their texts start at different places. A turn puts them in rows of two columns (`.turn__row`: a `.turn__mark`, then a `.turn__main`), so every line of text of a reply starts at the same place. The distances say who belongs to whom: 4 inside a `.turn__group`, 12 between the groups of a turn, the chat's own gap between turns.
+- Rows: `.turn__row--sm` is a line of work (small text), a plain `.turn__row` is what the person reads, `.turn__row--tight` keeps a sentence and the note under it together. In a row: `.turn__line` (`--wrap`), `.turn__end`, `.turn__step` (`.is-now`, `.is-done`), `.turn__label`, `.turn__text`, `.turn__strong`, `.turn__note` (`--error`), `.turn__file`, `.turn__actions`, `.turn__out` (`--error`); `.turn__mark--success` and `.turn__mark--warning` color an icon in the mark.
+- `details.turn__more`: a row that opens (an action's output), its chevron turning; `.turn__more--flat` folds a finished turn's work into one line that opens to a turn inside the turn.
+- The face stays on the middle of its turn's first line, also when that line is small.
+- **The question that waits** (`.ask`, `.ask__title`): drawn in the message box's place in `.composer`, so where the person answers is where it asks. It never grows past three composers; what it shows scrolls inside it.
+- No new tokens: every value is an existing one.
+- Docs: Chat page, A turn.
+
 ## 1.1.21 (2026-11-17)
 
 Three small additions for things that are only read or only looked at. Nothing that exists changes.

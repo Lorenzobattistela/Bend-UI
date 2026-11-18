@@ -1178,6 +1178,74 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 @keyframes plan-pop { from { transform: scale(.6); } }
 @keyframes plan-fill { from { --p: 0; } to { --p: .9; } }
 
+/* ---------- A turn: everything a reply is made of, on one ruler (1.1.22) ----------
+   The harness parts above each bring their own side padding, so stacked in one reply their texts start
+   at different places. A turn puts them in rows of two columns, a mark and the text: every line of text
+   of a reply starts at the same place, and what came of the reply (its questions, the rules it heard)
+   stays inside it. The distances say who belongs to whom: 4 inside a group, 12 between the groups of a
+   turn, the chat's own gap between turns.
+   <div class="msg msg--face"><div class="msg__face">(agent)</div><div class="turn">
+     <div class="turn__group">
+       <div class="turn__row turn__row--sm"><div class="turn__mark">(a plan node, a chevron, a dot)</div>
+         <div class="turn__main"><div class="turn__line"><span class="tool__kind">Read</span>
+           <span class="tool__what mono">GDD.md</span><span class="tool__meta">5 lines</span></div></div></div>
+     </div>
+     <div class="turn__row"><div class="turn__mark"></div><div class="turn__main"><div class="prose">…</div></div></div>
+   </div></div>
+   .turn__row--sm is a line of work (small text); a plain .turn__row is what the person reads (the reply,
+   a question, a rule). .turn__line is one line of parts; .turn__end goes to its right end. */
+.turn { min-width: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.turn__group { display: flex; flex-direction: column; gap: var(--space-1); }
+.turn__row { display: grid; grid-template-columns: var(--space-4) minmax(0, 1fr); column-gap: var(--space-2); align-items: start; font-size: var(--text-lg); line-height: var(--leading-body); }
+.turn__row--sm { font-size: var(--text-sm); line-height: var(--leading-ui); color: var(--text-2); }
+.turn__mark { height: 1lh; display: flex; align-items: center; justify-content: center; color: var(--text-3); }
+.turn__mark > .plan__step { gap: var(--space-0); }
+.turn__mark--success { color: var(--success-text); }
+.turn__mark--warning { color: var(--warning-text); }
+.turn__main { min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
+.turn__row--tight > .turn__main { gap: var(--space-0); }   /* a sentence and the note under it */
+.turn__line { display: flex; align-items: baseline; gap: var(--space-2); min-width: 0; }
+.turn__line--wrap { flex-wrap: wrap; align-items: center; row-gap: var(--space-1); }
+.turn__line .tool__what { color: var(--text); }
+.turn__end { margin-left: auto; }
+.turn__step.is-now { color: var(--text); font-weight: var(--weight-semibold); }
+.turn__step.is-done { color: var(--text-detail); text-decoration: line-through; }
+.turn__label { font-weight: var(--weight-medium); color: var(--text-2); }
+.turn__text { color: var(--text); overflow-wrap: anywhere; }
+.turn__strong { font-weight: var(--weight-semibold); color: var(--text); }
+.turn__note { font-size: var(--text-sm); line-height: var(--leading-ui); color: var(--text-2); }
+.turn__note--error { color: var(--danger-text); }
+.turn__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-2); }
+.turn__row--tight .turn__actions { margin-top: var(--space-2); }
+.turn__out { margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); line-height: var(--leading-ui); color: var(--text-2); white-space: pre-wrap; overflow-wrap: anywhere; }
+.turn__out--error { color: var(--danger-text); }
+.turn__file { display: inline-flex; align-items: baseline; gap: var(--space-1); }
+.turn .prose { max-width: none; }
+.turn .code-block { margin: 0; }
+/* A row that opens (an action's output, a finished turn's work): <details class="turn__more"><summary
+   class="turn__row turn__row--sm">…(a chevron-right in its mark)…</summary>(what it shows)</details>.
+   What it shows starts at the text column; .turn__more--flat shows rows of the turn itself, from the mark column. */
+.turn__more > summary { list-style: none; cursor: pointer; border-radius: var(--radius-sm); }
+.turn__more > summary::-webkit-details-marker { display: none; }
+.turn__more > summary:hover .tool__kind { color: var(--text); }
+.turn__more > summary:focus-visible { outline: none; box-shadow: 0 0 0 var(--focus-halo) var(--accent-soft); }
+.turn__more > summary .turn__mark > .icon { transition: transform var(--duration) var(--ease); }
+.turn__more[open] > summary .turn__mark > .icon { transform: rotate(90deg); }
+.turn__more > :not(summary) { margin: var(--space-1) 0 0 calc(var(--space-4) + var(--space-2)); }
+.turn__more--flat > :not(summary) { margin: var(--space-2) 0 0; }
+@media (prefers-reduced-motion: reduce) { .turn__more > summary .turn__mark > .icon { transition: none; } }
+/* The face stays on the middle of its turn's first line, also when that line is small. */
+.msg--face:has(> .msg__face + .turn > :is(.turn__row--sm, .turn__group, .turn__more):first-child) > .msg__face { margin-top: calc((var(--text-sm) * var(--leading-ui) - var(--text-lg) * var(--leading-body)) / 2); }
+
+/* The question that waits takes the message box's place: where the person answers is where it asks.
+   <form class="composer"><div class="ask"><div class="turn__row"><div class="turn__mark"><span class="dot dot--warning"></span></div>
+   <div class="turn__main"><span class="ask__title">Allow the chat to write index.html?</span>(a code block, a note)
+   <div class="turn__actions">(buttons)</div></div></div></div><div class="composer__bar">…</div></form>
+   It never grows past three composers: what it shows scrolls inside it. */
+.ask { max-width: var(--measure); max-height: calc(var(--composer-max) * 3); overflow-y: auto; margin: 0 auto; padding: var(--space-3); border: var(--border-width) solid var(--accent); border-radius: var(--chat-box-radius); background: var(--surface); box-shadow: 0 0 0 var(--focus-halo) var(--accent-soft); }
+.ask .turn__main { gap: var(--space-3); }
+.ask__title { font-weight: var(--weight-medium); color: var(--text); overflow-wrap: anywhere; }
+
 /* How much of the context is used: a label, a bar, the value. */
 .meter { display: flex; align-items: center; gap: var(--space-2); font-size: var(--text-sm); color: var(--text-2); }
 .meter__bar { flex: 1; min-width: var(--space-8); height: var(--meter-bar); border-radius: var(--radius-full); background: var(--surface-2); overflow: hidden; }
