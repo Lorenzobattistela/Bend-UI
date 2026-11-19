@@ -1,0 +1,42 @@
+/* Inspect (opt-in: import "bend-ui/inspect"): what is drawn over a piece to read it. Every measure is a token
+   or a value of INSPECT.bend (inspect.js writes each as a CSS variable). INSPECT.bend decides the bands;
+   inspect.js draws them. Existing components keep their definitions and appearance. */
+
+/* The piece being read, and the drawing over it. The drawing never takes the pointer. */
+.inspect-host { position: relative; }
+.inspect { position: absolute; inset: 0; z-index: var(--inspect-layer); overflow: hidden; pointer-events: none; }
+.inspect > * { position: absolute; box-sizing: border-box; font-style: normal; }
+
+/* A band: one space, in its kind's color, with its number when it fits. */
+.inspect__band { display: flex; align-items: center; justify-content: center; }
+.inspect__band--pad { background: color-mix(in srgb, var(--accent) var(--inspect-tint), transparent); color: var(--accent-text); }
+.inspect__band--gap { background: color-mix(in srgb, var(--warning) var(--inspect-tint), transparent); color: var(--warning-text); }
+.inspect__band--margin { background: color-mix(in srgb, var(--text-3) var(--inspect-tint), transparent); color: var(--text-2); }
+.inspect__n { padding: 0 var(--space-hairline); border-radius: var(--radius-xs); background: var(--bg); font-family: var(--font-mono); font-size: var(--text-xs); font-weight: var(--weight-semibold); line-height: var(--leading-tight); font-variant-numeric: tabular-nums; }
+
+/* The part under the pointer, and the part picked. */
+.inspect__box { border: var(--border-width) dashed var(--text-3); }
+.inspect__box--picked { border: var(--focus-width) solid var(--accent); }
+
+/* A pin: where a comment points. --new is the one being written. */
+.inspect__pin { display: flex; align-items: center; justify-content: center; width: var(--inspect-pin); height: var(--inspect-pin); margin: calc(var(--inspect-pin) / -2) 0 0 calc(var(--inspect-pin) / -2); border-radius: var(--radius-full); background: var(--accent); color: var(--accent-fg); font-size: var(--text-xs); font-weight: var(--weight-semibold); font-variant-numeric: tabular-nums; box-shadow: var(--shadow-float); }
+.inspect__pin--new { border: var(--focus-width) solid var(--accent); background: var(--bg); color: var(--accent-text); }
+
+/* The key: which color is which space. */
+.inspect-key { display: inline-flex; align-items: center; gap: var(--space-3); font-size: var(--text-xs); color: var(--text-2); }
+.inspect-key__item { display: inline-flex; align-items: center; gap: var(--space-1); }
+.inspect-key__mark { width: var(--space-2); height: var(--space-2); border-radius: var(--radius-xs); }
+.inspect-key__mark--pad { background: color-mix(in srgb, var(--accent) var(--inspect-tint), transparent); }
+.inspect-key__mark--gap { background: color-mix(in srgb, var(--warning) var(--inspect-tint), transparent); }
+.inspect-key__mark--margin { background: color-mix(in srgb, var(--text-3) var(--inspect-tint), transparent); }
+
+/* A part's values: a name and what it is, one per row. */
+.inspect-facts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2) var(--space-3); align-items: center; margin: 0; }
+.inspect-facts dt { color: var(--text-detail); font-size: var(--text-sm); }
+.inspect-facts dd { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); margin: 0; font-family: var(--font-mono); font-size: var(--text-sm); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+/* A page in a frame, read from outside: the frame fills its host and the drawing sits exactly over it.
+   Under it, what the tools say (the key, the picked part's values), scrolling by itself. */
+.inspect-host--fill { flex: 1; min-width: 0; min-height: 0; }
+.inspect-frame { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
+.inspect-out { flex: none; display: flex; flex-direction: column; gap: var(--space-3); max-height: var(--inspect-out-share); overflow-y: auto; padding: var(--space-3); border-top: var(--border-width) solid var(--border); }

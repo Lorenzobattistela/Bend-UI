@@ -1,6 +1,6 @@
 {
   "name": "bend-ui",
-  "version": "1.1.28",
+  "version": "1.1.29",
   "description": "Design system in Bend: tokens in TOKENS.bend, rules in LAWS.bend.",
   "type": "module",
   "main": "ui.js",
@@ -34,7 +34,10 @@
     "./panes.css": "./panes.css",
     "./PANES.bend": "./PANES.bend",
     "./TREE.bend": "./TREE.bend",
-    "./TERM.bend": "./TERM.bend"
+    "./TERM.bend": "./TERM.bend",
+    "./inspect": "./inspect.js",
+    "./inspect.css": "./inspect.css",
+    "./INSPECT.bend": "./INSPECT.bend"
   },
   "files": [
     "ui.js",
@@ -77,6 +80,9 @@
     "panes.js",
     "panes.css",
     "PANES.bend",
+    "inspect.js",
+    "inspect.css",
+    "INSPECT.bend",
     "TREE.bend",
     "TERM.bend"
   ],

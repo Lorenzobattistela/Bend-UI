@@ -902,3 +902,35 @@ A thin line of state at the top of a window. Each `.strip__item` is an optional 
   <span class="strip__item strip__end">Ask before changes</span>
 </div>
 ```
+
+## Inspect extension (1.1.29)
+
+`import "bend-ui/inspect"` adds what is drawn over a piece of interface to read it: the space inside each part (padding), around it (margin) and between its children (gap) with its number, the part under the pointer, the part picked, and a pin where a comment points. Existing components keep their definitions and appearance. The measures live in `INSPECT.bend`, all marked `# undecided` (no law yet); `inspect.js` writes each as a CSS variable. The logic is Bend: `INSPECT.bend` decides every band (`pad`, `around`, `between`) and names every value on the scale (`space_name`, `radius_name`); `inspect.js` reads the boxes from the page and draws what Bend returns.
+
+```html
+<div class="inspect-host">
+  <div id="piece">…</div>
+  <div class="inspect"></div>
+</div>
+```
+
+```js
+import { readBoxes, readBox, readPart, draw, facts, key } from "bend-ui/inspect";
+
+const corner = layer.getBoundingClientRect();
+draw(layer, {
+  boxes: readBoxes(piece),                      // padding, margin and gaps of every part
+  at: { x: corner.left, y: corner.top },        // the layer's own corner, in the boxes' measures
+  hover: readBox(partUnderThePointer),          // dashed
+  picked: readBox(partPicked),                  // in the accent
+  pins: [{ box: readBox(part), fx: 0.5, fy: 0.5, label: 1 }],
+});
+out.innerHTML = facts(readPart(partPicked));    // each space and corner with its token, or "off the scale"
+legend.innerHTML = key();                       // which color is which space
+```
+
+A page in a frame: `.inspect-host--fill` holds an `iframe.inspect-frame` with the `.inspect` drawing exactly over it, and `.inspect-out` under it holds what the tools say (the key, the picked part's values).
+
+A box is plain numbers (`{ x, y, w, h, pad, margin, rowGap, colGap, kids }` with `pad` and `margin` as `[top, right, bottom, left]`), so a page in a frame can read its own boxes and send them: `draw()` only needs them in the same measures as `at`. A band shows its number when it is at least `inspect_says_across` thick (or `inspect_says_along` wide, for one that stands); room between two children that isn't the part's own gap is not drawn.
+
+Ideas from: the box model overlay of Chrome DevTools and Firefox, the measures of Figma's Dev Mode, and the comment pins of Figma and of Claude's artifacts.

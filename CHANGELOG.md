@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.1.29 (2026-11-19)
+
+The inspect extension (opt-in: `import "bend-ui/inspect"`), for reading a piece of interface where it is drawn. Only adds: nothing that exists changes.
+
+- **Measures**: `.inspect` over an `.inspect-host` holds an `.inspect__band` for each space: `--pad` inside a part, `--margin` around it, `--gap` between two children, each with its number (`.inspect__n`) when it fits. Room that isn't the part's own gap is not drawn.
+- **A part**: `.inspect__box` outlines the part under the pointer, `.inspect__box--picked` the one picked; `.inspect-facts` lists its values, each space and corner with its token or "off the scale".
+- **A pin**: `.inspect__pin` where a comment points; `--new` is the one being written.
+- `.inspect-key`: which color is which space.
+- **A page in a frame**: `.inspect-host--fill` holds an `iframe.inspect-frame` with the `.inspect` drawing exactly over it; `.inspect-out` under it holds what the tools say.
+- `INSPECT.bend` decides every band (`pad`, `around`, `between`), names every value on the scale (`space_name`, `radius_name`) and holds the measures (`inspect_pin`, `inspect_says_across`, `inspect_says_along`, `inspect_layer`, `inspect_out_share`, `inspect_tint`), all undecided. `inspect.js` reads the boxes (`readBoxes`, `readBox`, `readPart`) and draws (`draw`, `facts`, `key`). A box is plain numbers, so it can come from a page in a frame.
+- Ideas from: the box model overlay of Chrome DevTools and Firefox, the measures of Figma's Dev Mode, the comment pins of Figma and of Claude's artifacts.
+
 ## 1.1.28 (2026-11-18)
 
 - `.card[data-tone="accent"]`: a card in the accent tone, on the accent's soft ground like `.tag--accent`. Its edge, hover and focus stay the card's. Only adds.
