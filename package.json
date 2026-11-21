@@ -37,7 +37,13 @@
     "./TERM.bend": "./TERM.bend",
     "./inspect": "./inspect.js",
     "./inspect.css": "./inspect.css",
-    "./INSPECT.bend": "./INSPECT.bend"
+    "./INSPECT.bend": "./INSPECT.bend",
+    "./web": "./web.js",
+    "./web-driver": "./web-driver.js",
+    "./Web.bend": "./Web.bend",
+    "./UI.bend": "./UI.bend",
+    "./PATCH.bend": "./PATCH.bend",
+    "./page/*": "./page/*"
   },
   "files": [
     "ui.js",
@@ -84,7 +90,15 @@
     "inspect.css",
     "INSPECT.bend",
     "TREE.bend",
-    "TERM.bend"
+    "TERM.bend",
+    "web.js",
+    "web-driver.js",
+    "Web.bend",
+    "UI.bend",
+    "PATCH.bend",
+    "WEB_LAWS.bend",
+    "WEB_PROOF.bend",
+    "page"
   ],
   "scripts": {
     "check": "bend PROOF.bend && bun board-check.js",

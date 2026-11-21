@@ -4,6 +4,7 @@ import Base
 import ./WORKSPACE_PROOF.bend as WorkspaceProof
 import ./BOARD_PROOF.bend as BoardProof
 import ./MOTION_PROOF.bend as MotionProof
+import ./WEB_PROOF.bend as WebProof
 import ./LAWS.bend as Laws
 
 def Laws.btn_padding_in_scale():
