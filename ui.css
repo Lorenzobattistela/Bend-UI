@@ -1480,3 +1480,5 @@ html:not([data-narrow]) .window:not(.is-full) {
 /* Fairy opts into the same face slot and option menu; canvas draws the volume. */
 .agent--fairy .agent__face, .agent__face--fairy { background: var(--fairy-surface); box-shadow: none; overflow: visible; }
 .agent__fairy { display: block; position: absolute; inset: var(--fairy-canvas-offset); width: var(--fairy-canvas-size); height: var(--fairy-canvas-size); pointer-events: none; }
+
+.chat__start .agent__fairy { top: var(--fairy-start-offset); }

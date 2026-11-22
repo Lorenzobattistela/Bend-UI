@@ -31,6 +31,7 @@ try {
   animator.reset(); compare(fixtures.trajectory[0].expected,animator.step(fixtures.trajectory[0].input),.00002);
   const vol=N.preparedVolume(N.fairy).vol, core=vol.parts[0];
   assert.equal(vol.parts.length,15); assert.equal(vol.eyePart,0); assert.equal(core.depth,41);
+  assert(Math.abs(parseFloat(N.Tokens.fairy_canvas_size()) * core.depth / 100 - 100) < .00001, "Fairy body must fill the classic face diameter");
   for(let x=30;x<=70;x+=.5)for(let y=32;y<=72;y+=.5){
     const expected=Math.sqrt(Math.max(0,20.5**2-(x-50)**2-(y-52)**2));
     if(expected>1)assert(Math.abs(core.height(x,y)-expected)<.00001,'Core must be a sphere');

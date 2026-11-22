@@ -351,6 +351,10 @@ def dark_syntax_removed() -> String: dark_danger_text()
 # Fairy agent: vivid teal and the canvas within the existing face slot.
 def fairy_color() -> String: "#00d6b5"
 def fairy_ink() -> String: "#151515"
-def fairy_canvas_size() -> String: "100%"
-def fairy_canvas_offset() -> String: "0px"
+# 100 / the core diameter (41): agent_sm/lg/xl measures the sphere, not its filaments.
+def fairy_canvas_size() -> String: "243.902439%"
+def fairy_canvas_offset() -> String: "-71.9512195%"
 def fairy_surface() -> String: "transparent"
+
+# Keep the larger filaments clear of the start composer without moving the composer.
+def fairy_start_offset() -> String: "-121.9512195%"

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.31 (2026-11-21)
+
+- Size Fairy by its spherical body so it matches the classic agent ball at every size. Keep the start screen filaments above the composer without changing the page layout.
+
 ## 1.1.30 (2026-11-21)
 
 - Add optional Fairy to `mountAgent`, preserving the classic default and option menu API.
