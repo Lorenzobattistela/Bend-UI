@@ -10,6 +10,7 @@
 // Importing this file turns Bend-UI on, as importing "bend-ui" does.
 
 import { initSegmented, initArea, initButtons } from "./ui.js";
+import { mountAgent } from "./agent.js";
 import { mount as run } from "./web-driver.js";
 
 const pressed = new WeakMap();   // each segmented's pressed button at the last draw
@@ -31,7 +32,31 @@ function alive(root) {
 
 // mount(root, program, options): as web-driver.js's mount (adopt, patched, changed).
 export function mount(root, program, options = {}) {
-  return run(root, program, { ...options, patched(r) { alive(r); options.patched?.(r); } });
+  const agents = new Map();
+  function syncAgents(r) {
+    const slots = new Set(all(r, "[data-ui-agent]"));
+    for (const [el, entry] of agents) {
+      const key = `${el.dataset.uiAgent}|${el.dataset.size}`;
+      if (!slots.has(el) || key !== entry.key) {
+        entry.face.destroy(); entry.host.remove(); agents.delete(el);
+      }
+    }
+    for (const el of slots) {
+      let entry = agents.get(el);
+      if (!entry) {
+        const host = document.createElement("div"); el.append(host);
+        const face = mountAgent(host, { avatar: el.dataset.uiAgent, size: el.dataset.size, still: true, state: el.dataset.state, mood: el.dataset.mood });
+        entry = { host, face, key: `${el.dataset.uiAgent}|${el.dataset.size}`, state: el.dataset.state, mood: el.dataset.mood };
+        agents.set(el, entry);
+      }
+      if (entry.state !== el.dataset.state) { entry.face.setState(el.dataset.state); entry.state = el.dataset.state; }
+      if (entry.mood !== el.dataset.mood) { entry.face.setMood(el.dataset.mood); entry.mood = el.dataset.mood; }
+    }
+  }
+  const app = run(root, program, { ...options, patched(r) { alive(r); syncAgents(r); options.patched?.(r); } });
+  const stop = app.stop;
+  app.stop = () => { for (const entry of agents.values()) { entry.face.destroy(); entry.host.remove(); } agents.clear(); stop(); };
+  return app;
 }
 
 // start(program): the program on <div id="app">.

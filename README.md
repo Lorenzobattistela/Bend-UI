@@ -502,6 +502,24 @@ Brand marks for AI options are in `brand/` (`claude.webp`, `openai.svg`); see `b
 
 `still: true` is a face that only looks (beside a chat's reply): it opens nothing, so it takes no focus, has no pointer cursor, and screen readers skip it.
 
+### Fairy avatar
+
+`mountAgent(el, { avatar: "fairy", size: "lg", items, onPick })` opts into Fairy. Omitting `avatar` keeps the classic face. The existing menu, hover/click opening, item status, `spin`, `shake`, `lookAtEl`, `ask`, `flyBetween` and `destroy` API still apply.
+
+Fairy adds `setState("idle" | "thinking" | "working" | "waiting" | "blocked" | "done")` and `setMood("neutral" | "happy")`. The pointer is followed across the page. Reduced motion follows the system. All live faces share one frame clock, including small toolbar faces.
+
+Its approved contour lives in `FAIRY.bend`, with a spherical core (equal 20.5-unit radii), circular filaments and vivid teal `--fairy-color` (`#00d6b5`). Override that token locally to recolor the avatar. `FAIRY_MOTION.bend` and `FAIRY_ANIMATOR.bend` own easing, poses and interrupted transitions. The licensed Open Bot Avatar renderer draws the volume to canvas; browser modules handle input, layout and rendering.
+
+In a page written with `Web.bend`, import `UI.bend` and render:
+
+```python
+Ui.agent(Ev, Ui.fairy{}, Ui.agent_lg{}, "idle", "neutral", "Fairy")
+```
+
+Run the page with `mount` from `bend-ui/web`. The canvas survives unrelated view patches; changing state or mood updates it, and removing the slot or calling `stop()` disposes it. This form is a labeled image; use `mountAgent` for an interactive options menu. `Ui.classic{}` and `Ui.agent_sm{}` are also available.
+
+The renderer attribution and adaptation notes are in `fairy-renderer/NOTICE.txt`. `bun run check` includes reference motion fixtures, interrupted transitions, rotated frames and the spherical surface.
+
 ## Components
 
 The markup of each piece. The docs show these same snippets on each piece's page.

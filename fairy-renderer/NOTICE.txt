@@ -1,0 +1,13 @@
+Open Bot Avatar renderer
+https://github.com/DominikScholz/open-bot-avatar
+Version 0.3.0, commit 5e64c081971eb296f562544641bad37d40fb36b6
+Copyright (c) 2026 Dominik Scholz. MIT; see LICENSE.
+
+This is an adapted renderer, not an unmodified vendor snapshot.
+- motion.ts, follow.ts and animator.ts bridge to Bend motion/history modules.
+- volume.ts uses the authored Fairy sphere and circular filament sections.
+- dom/mount.ts keeps full display cadence at small editor sizes.
+- Example characters and the upstream motion implementation are not included.
+- Projection, section rendering, canvas painting, pointer and clock plumbing remain upstream.
+
+Fairy's silhouette is the approved Gitmon-inspired authored asset in FAIRY.bend.

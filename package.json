@@ -1,6 +1,6 @@
 {
   "name": "bend-ui",
-  "version": "1.1.29",
+  "version": "1.1.30",
   "description": "Design system in Bend: tokens in TOKENS.bend, rules in LAWS.bend.",
   "type": "module",
   "main": "ui.js",
@@ -43,7 +43,10 @@
     "./Web.bend": "./Web.bend",
     "./UI.bend": "./UI.bend",
     "./PATCH.bend": "./PATCH.bend",
-    "./page/*": "./page/*"
+    "./page/*": "./page/*",
+    "./fairy": "./fairy.js",
+    "./FAIRY.bend": "./FAIRY.bend",
+    "./FAIRY_MOTION.bend": "./FAIRY_MOTION.bend"
   },
   "files": [
     "ui.js",
@@ -98,10 +101,17 @@
     "PATCH.bend",
     "WEB_LAWS.bend",
     "WEB_PROOF.bend",
-    "page"
+    "page",
+    "fairy.js",
+    "fairy-renderer",
+    "FAIRY.bend",
+    "FAIRY_MOTION.bend",
+    "FAIRY_ANIMATOR.bend",
+    "fairy-check.js",
+    "test"
   ],
   "scripts": {
-    "check": "bend PROOF.bend && bun board-check.js",
+    "check": "bend PROOF.bend && bun board-check.js && bend FAIRY.bend --check-only && bend FAIRY_MOTION.bend --check-only && bend FAIRY_ANIMATOR.bend --check-only && bun fairy-check.js",
     "docs": "bun docs/read-laws.js && cd docs && bun index.html",
     "site": "bun docs/read-laws.js && rm -rf site && bend docs/index.html -o site && cp docs/404.html site/404.html"
   }

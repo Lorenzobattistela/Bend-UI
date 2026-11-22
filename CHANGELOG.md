@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.30 (2026-11-21)
+
+- Add optional Fairy to `mountAgent`, preserving the classic default and option menu API.
+- Keep the approved contour with a spherical core and vivid teal color token. Motion, cursor tracking and interrupted state transitions run in Bend; the Open Bot canvas renderer is included under MIT.
+- Add `Ui.agent` for Web.bend, with persistent canvases across patches and disposal on removal or stop. Small Fairy faces render at the display cadence.
+- Include the Web.bend/UI.bend page bridge introduced on the web branch.
+
 ## 1.1.29 (2026-11-19)
 
 The inspect extension (opt-in: `import "bend-ui/inspect"`), for reading a piece of interface where it is drawn. Only adds: nothing that exists changes.

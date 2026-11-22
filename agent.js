@@ -16,6 +16,8 @@
 //   agent.setItem("claude", { status: "busy", label: "Connecting…" });
 //   agent.spin(); agent.shake(); agent.lookAtEl(someLine); agent.ask(true);
 
+import { mountFairy } from "./fairy.js";
+import { subscribeFrames } from "./fairy-renderer/dom/clock.ts";
 import M from "./MOTION.bend";
 import T from "./TOKENS.bend";
 
@@ -26,18 +28,21 @@ let pointer = null;
 addEventListener("pointermove", (e) => { pointer = { x: e.clientX, y: e.clientY }; }, { passive: true });
 
 export function mountAgent(root, opts = {}) {
+  const isFairy = opts.avatar === "fairy";
   const size = opts.size || "lg";
   const layout = opts.layout || (size === "lg" ? "fan" : "row");
   const btn = size === "lg" ? "btn btn--icon btn--lg btn--round" : "btn btn--icon btn--sm btn--round";
   const iconCls = size === "lg" ? "icon icon--lg" : "icon";
 
   root.classList.add("agent", "agent--" + size);
+  root.classList.toggle("agent--fairy", isFairy);
+  const faceContent = isFairy ? '<span class="agent__fairy"></span>' : '<i class="agent__eye"></i><i class="agent__eye"></i>';
   // still: a face that only looks. It opens nothing, so it takes no focus and screen readers skip it.
   root.classList.toggle("agent--still", !!opts.still);
   root.innerHTML =
     (opts.still
-      ? `<button class="agent__face" tabindex="-1" aria-hidden="true"><i class="agent__eye"></i><i class="agent__eye"></i></button>`
-      : `<button class="agent__face" aria-label="${opts.label || "Agent"}" aria-expanded="false"><i class="agent__eye"></i><i class="agent__eye"></i></button>`) +
+      ? `<button class="agent__face" tabindex="-1" aria-hidden="true">${faceContent}</button>`
+      : `<button class="agent__face" aria-label="${opts.label || "Agent"}" aria-expanded="false">${faceContent}</button>`) +
     (opts.items || []).map((it) =>
       `<button class="${btn} agent__item" data-id="${it.id}" aria-label="${it.label}" tabindex="-1">` +
         (it.ring ? RING : "") +
@@ -46,6 +51,8 @@ export function mountAgent(root, opts = {}) {
       `</button>`).join("");
 
   const face = root.querySelector(".agent__face");
+  const fairy = isFairy ? mountFairy(face.firstElementChild, { state: opts.state, mood: opts.mood, reducedMotion: opts.reducedMotion }) : null;
+  face.classList.toggle("agent__face--fairy", isFairy);
   const eyes = [...root.querySelectorAll(".agent__eye")];
   const items = [...root.querySelectorAll(".agent__item")];
   items.forEach((b) => { b._p = 0; b._t = 0; });
@@ -68,6 +75,7 @@ export function mountAgent(root, opts = {}) {
 
   // Look: at a point on screen, at an element, or straight ahead (null).
   s.lookAt = (x, y, amount = 1) => {
+    if (fairy) { fairy.lookAt(x, y, amount); return; }
     const r = face.getBoundingClientRect();
     const reach = Math.max(r.width * M.look_reach(), M.look_reach_min());
     const dx = x - (r.left + r.width / 2), dy = y - (r.top + r.height / 2);
@@ -75,9 +83,13 @@ export function mountAgent(root, opts = {}) {
     s.tp = M.look_pitch(dx, dy, reach) * amount;
   };
   s.lookAtEl = (el) => { s.target = el; };
-  s.spin = () => { s.turns += 2 * Math.PI; };      // one full turn: "done"
-  s.shake = () => { s.shakeT = M.shake_time(); };              // a small "no"
+  s.spin = () => { if (fairy) fairy.spin(); else s.turns += 2 * Math.PI; };      // one full turn: "done"
+  s.shake = () => { if (fairy) fairy.shake(); else s.shakeT = M.shake_time(); };              // a small "no"
   s.ask = (on) => { root.classList.toggle("is-asking", on); if (on) setOpen(true); };
+
+  // Fairy states are independent from the option buttons and their connection status.
+  s.setState = (state) => fairy?.update({ state });
+  s.setMood = (mood) => fairy?.update({ mood });
 
   // An item: status (busy | ok | hold | warn | error | ""), label, pressed, disabled.
   s.setItem = (id, st = {}) => {
@@ -113,10 +125,18 @@ export function mountAgent(root, opts = {}) {
   const escape = (e) => { if (e.key === "Escape" && s.isOpen) { setOpen(false); face.focus(); } };
   document.addEventListener("pointerdown", outside);
   document.addEventListener("keydown", escape);
-  const blink = setInterval(() => { if (Math.random() < M.blink_chance()) { s.blink = M.blink_closed(); setTimeout(() => s.blink = 1, M.blink_hold() * 1000); } }, (M.blink_every() + Math.random() * M.blink_jitter()) * 1000);
+  const blink = fairy ? null : setInterval(() => { if (Math.random() < M.blink_chance()) { s.blink = M.blink_closed(); setTimeout(() => s.blink = 1, M.blink_hold() * 1000); } }, (M.blink_every() + Math.random() * M.blink_jitter()) * 1000);
 
   s.update = (dt) => {
     if (!root.offsetParent) return;   // hidden: nothing to draw
+    const R = face.offsetWidth / 2;
+    if (fairy) {
+      if (s.target?.isConnected) {
+        const r = s.target.getBoundingClientRect();
+        fairy.lookAt(r.left + r.width * M.look_el_x(), r.top + r.height / 2, M.look_el_amount());
+      } else fairy.follow();
+      fairy.tick(performance.now(), lessMotion.matches);
+    } else {
     // where to look: the pointer while hovered or open, else the target, else ahead
     if ((s.hover || s.isOpen) && pointer) s.lookAt(pointer.x, pointer.y);
     else if (s.target && s.target.isConnected) { const r = s.target.getBoundingClientRect(); s.lookAt(r.left + r.width * M.look_el_x(), r.top + r.height / 2, M.look_el_amount()); }
@@ -131,7 +151,6 @@ export function mountAgent(root, opts = {}) {
       s.yaw += s.vy * dt; s.pitch += s.vp * dt;
     }
 
-    const R = face.offsetWidth / 2;
     const lon = M.eye_lon(), lat = M.eye_lat();
     [-lon, lon].forEach((l, i) => {
       const x = M.face_x(l, lat, s.yaw), y = M.face_y(l, lat, s.yaw, s.pitch), z = M.face_z(l, lat, s.yaw, s.pitch);
@@ -141,6 +160,8 @@ export function mountAgent(root, opts = {}) {
       e.transform = `translate(-50%, -50%) scale(${M.squash(x).toFixed(3)}, ${(M.squash(y) * s.blink).toFixed(3)})`;
       e.opacity = Math.max(0, Math.min(1, z * M.eye_fade())).toFixed(3);
     });
+
+    }
 
     const w = items.length ? items[0].offsetWidth : 0, gap = size === "lg" ? R * M.fan_gap() : T.space_2();
     items.forEach((b, i) => {
@@ -156,7 +177,9 @@ export function mountAgent(root, opts = {}) {
   };
 
   s.destroy = () => {
-    agents.delete(s); clearInterval(blink); clearTimeout(closeT);
+    agents.delete(s); clearInterval(blink); clearTimeout(closeT); clearTimeout(s._flash);
+    fairy?.destroy();
+    if (!agents.size) { releaseFrames?.(); releaseFrames = null; }
     document.removeEventListener("pointerdown", outside);
     document.removeEventListener("keydown", escape);
     root.innerHTML = "";
@@ -164,6 +187,7 @@ export function mountAgent(root, opts = {}) {
 
   setOpen(false);
   agents.add(s);
+  startFrames();
   return s;
 }
 
@@ -176,6 +200,9 @@ export function flyBetween(fromRect, to, done) {
   const ghost = to.face.cloneNode(true);
   Object.assign(ghost.style, { position: "fixed", left: fromRect.left + "px", top: fromRect.top + "px", width: fromRect.width + "px", height: fromRect.height + "px", zIndex: T.layer_fly(), margin: 0, pointerEvents: "none" });
   ghost.querySelectorAll(".agent__eye").forEach((e) => e.style.transform = "translate(-50%, -50%)");
+  const sourceCanvas = to.face.querySelector("canvas");
+  const ghostCanvas = ghost.querySelector("canvas");
+  if (sourceCanvas && ghostCanvas) ghostCanvas.getContext("2d")?.drawImage(sourceCanvas, 0, 0);
   document.body.append(ghost);
   to.face.style.opacity = 0;
   const dx = (b.left + b.width / 2) - (fromRect.left + fromRect.width / 2), dy = (b.top + b.height / 2) - (fromRect.top + fromRect.height / 2);
@@ -185,10 +212,14 @@ export function flyBetween(fromRect, to, done) {
   ).onfinish = () => { ghost.remove(); to.face.style.opacity = ""; done && done(); };
 }
 
-let last = performance.now();
-function frame(now) {
-  const dt = Math.min(M.max_step(), (now - last) / 1000); last = now;
-  agents.forEach((a) => a.update(dt));
-  requestAnimationFrame(frame);
+// Menus and Fairy share Open Bot's single measuring/drawing clock.
+let releaseFrames = null;
+function startFrames() {
+  if (releaseFrames) return;
+  let last = null;
+  releaseFrames = subscribeFrames({ draw(time) {
+    const dt = last === null ? 0 : Math.min(M.max_step(), time - last); last = time;
+    agents.forEach((a) => a.update(dt));
+    return agents.size > 0;
+  } });
 }
-requestAnimationFrame(frame);

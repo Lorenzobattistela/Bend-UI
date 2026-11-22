@@ -347,3 +347,10 @@ def dark_syntax_punct() -> String: "#c3c7cc"
 def dark_syntax_name() -> String: "#d2a8ff"
 def dark_syntax_added() -> String: dark_success_text()
 def dark_syntax_removed() -> String: dark_danger_text()
+
+# Fairy agent: vivid teal and the canvas within the existing face slot.
+def fairy_color() -> String: "#00d6b5"
+def fairy_ink() -> String: "#151515"
+def fairy_canvas_size() -> String: "100%"
+def fairy_canvas_offset() -> String: "0px"
+def fairy_surface() -> String: "transparent"

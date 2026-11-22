@@ -19,8 +19,8 @@
 # Limits now:
 # - The first components only: icon, button, segmented, dropdown and menu, input and field, panel,
 #   disclosure, separator, dot, and the text roles. The others are still written as `Web.node`.
-# - The components ui.js draws by itself (chart, diagram, agent, thread, tree, terminal, board) are
-#   not here: they are mounted from JS, as before.
+# - Agent has an owned slot, mounted by web.js. Chart, diagram, thread, tree, terminal and board
+#   are still mounted from JS.
 # - A segmented is always `data-manual`: Bend holds which choice is pressed.
 
 import Base
@@ -382,3 +382,26 @@ def dot_with(-Ev: Data, +ms: List<&2, Dot>, +attrs: List<&2, Web.Attr<Ev>>) -> W
 
 def dot(-Ev: Data, +ms: List<&2, Dot>) -> Web.HTML<Ev>:
   dot_with(Ev, ms, [])
+
+# ---------- Agent ----------
+# An owned empty slot: web.js mounts the face once and preserves it across patches.
+# State and mood are Open Bot's strings (idle/thinking/working/waiting/blocked/done,
+# neutral/happy). The option menu API remains mountAgent in bend-ui/agent.
+type AgentAvatar is Data:
+  classic{}
+  fairy{}
+type AgentSize is Data:
+  agent_sm{}
+  agent_lg{}
+def agent_avatar(avatar: AgentAvatar) -> String:
+  match avatar:
+    case classic{}: "classic"
+    case fairy{}: "fairy"
+def agent_size(size: AgentSize) -> String:
+  match size:
+    case agent_sm{}: "sm"
+    case agent_lg{}: "lg"
+def agent_with(-Ev: Data, avatar: AgentAvatar, size: AgentSize, state: String, mood: String, label: String, attrs: List<&2, Web.Attr<Ev>>) -> Web.HTML<Ev>:
+  Web.node{"div", Web.attr{"data-ui-agent", agent_avatar(avatar)} <> Web.attr{"data-size", agent_size(size)} <> Web.attr{"data-state", state} <> Web.attr{"data-mood", mood} <> Web.attr{"role", "img"} <> Web.attr{"aria-label", label} <> attrs, []}
+def agent(-Ev: Data, avatar: AgentAvatar, size: AgentSize, state: String, mood: String, label: String) -> Web.HTML<Ev>:
+  agent_with(Ev, avatar, size, state, mood, label, [])
