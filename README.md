@@ -713,6 +713,10 @@ Closed: a rail of icon buttons. Open: icon and label. Narrow (or under any `[dat
 
 `initSide(side)` and `setSide(side, open)` are exported for a side bar added later.
 
+On the rail nothing is wider than an icon button, so the side bar never scrolls sideways: a group's label keeps only the room that sets the group apart, a section's chevron is out. A section's state is a `.dot` in its toggle, after its text (`<span class="dot dot--busy" role="img" aria-label="working"></span>`); on the rail it sits on the icon's corner. `setSideSection(section, open)` opens or closes a section as a click on its button would, without opening the side bar.
+
+Something new being made in the side bar (a section before it has a name) is a `.btn.is-new`: on a soft ground of the accent, not a button yet. `bend-ui/motion` brings it and turns it into what it becomes (below).
+
 Row actions: wrap an item (or a section's toggle) in a `.side__row` with a `.dropdown.side__more` at its end. The ⋯ shows on hover, keyboard focus, while its menu is open and on the current item (always on narrow screens); on a section it sits before the chevron. A right-click on the row, the context-menu key or `Shift+F10` opens the same menu.
 
 ```html
@@ -797,6 +801,17 @@ Sources: [WCAG 2.2](https://www.w3.org/TR/WCAG22/), [ARIA Authoring Practices Gu
 ## Contributing
 
 Read [`AGENTS.md`](AGENTS.md). `LAWS.bend` and `SPEC.bend` change only with the repo owner's approval.
+
+## Motion between places (1.1.33)
+
+Opt-in: `import { … } from "bend-ui/motion"`. Motions that take a page from one place to another, approved in the artifact "LawEditor Transition Lab". Every number is in `MOTION.bend`; with reduced motion nothing moves and each function resolves at once.
+
+- **A plus that opens into an icon.** `plusIcon("folder")` gives an `svg.icon` drawn as a plus; `becomeIcon(svg)` opens its line into the icon's outline (plus, four-point star, icon), the whole icon landing softly, and from then on it is that icon. It works for an icon made of one outline. Each point of the outline starts on the arm of the plus that points its way (`plus_x`, `plus_y`).
+- **Something new in a side bar.** `arriveNew(btn)` shows a `.btn.is-new`'s ground and turns its plus into place; `settleNew(btn, { state })` lets the ground go while the plus becomes its icon and pops `state` (its dot) as it lands; `leaveNew(el)` takes it away quietly when nothing came of it. `makeRoom(el)` opens the room a new piece takes, `popIn(el, wait)` pops a small thing into place, `nudge(el)` is a small answer, `swapWords(el, text)` changes a label's words.
+- **Words that travel.** `liftWords(el)` hides `el` and leaves a copy of its words where they were (`.fly-words`), whatever the page does under it; `.land(target)` takes them to `target`, changing size, color, ground and corners on the way, and shows `target` as they land; `.drop()` puts everything back.
+- **From one place to the next.** `stepBack(els, toward)` sends what a place said toward where that place lives (its button), smaller and fainter, and resolves to a `release()`; `stepForward(els, from)` brings it back. `moveFrom(el, rect)` glides a piece that is in both places from where it was. `arrive(els, wait, from)` brings the next place's pieces one after another (`"below"`, `"side"` or `"here"`). `holdStill(canvas)` keeps a picture of a canvas in sight while the page is swapped under it.
+
+`jellyFlight` (Fairy's Jelly) now answers `gathered`: a promise that resolves when Fairy's tentacles are in and it is about to go, the beat for what should happen with it.
 
 ## Workspace extension (1.0.7)
 

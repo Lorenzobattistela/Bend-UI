@@ -155,3 +155,100 @@ def space_time_ms() -> U32: 360         # undecided. The room closing where the 
 def move_hold_ms() -> U32: 0            # undecided. A wait before the piece starts to close.
 # ease_spring (TOKENS.bend) played backwards: the same curve, mirrored, so a piece gathers before it goes.
 def ease_back() -> String: "cubic-bezier(.36, 0, .66, -.56)"
+
+# ---------- A plus that opens into an icon (motion.js: plusIcon, becomeIcon) ----------
+# The icon's outline is a line of points. Each comes from the arm of the plus that points its way: a point
+# straight out from the middle comes from that arm's tip, a point on a diagonal from the plus's middle. So the
+# plus opens like a hand into the icon. Icons are drawn on a grid of 24; the plus has arms of 7 around its middle.
+def plus_mid() -> F32: 12.0
+def plus_arm() -> F32: 7.0
+def plus_points() -> U32: 120            # how many points the line has
+
+# How far a direction is from the nearest arm: 0 along it, 1 on the diagonal between two. It is the angle
+# as a share of 45°, read from the tangent t (atan(t) is t·π/4 + 0.273·t·(1 − t), within 0.004).
+def plus_off.of(+t: F32) -> F32:
+  (t + 0.3476 * t * (1.0 - t) : F32)
+
+def plus_off(+dx: F32, +dy: F32) -> F32:
+  plus_off.of((F32.min(F32.abs(dx), F32.abs(dy)) / F32.max(F32.max(F32.abs(dx), F32.abs(dy)), 0.0001) : F32))
+
+# How far out on its arm a point of the icon starts.
+def plus_reach(+dx: F32, +dy: F32) -> F32:
+  (plus_arm() * (1.0 - plus_off(dx, dy)) : F32)
+
+def plus_side(+v: F32) -> F32:
+  Bool.pick(F32, F32.is_lt(v, 0.0), (0.0 - 1.0 : F32), 1.0)
+
+# Is the direction nearer a side arm (left, right) than an up or down one?
+def plus_across(+dx: F32, +dy: F32) -> Bool:
+  F32.is_ge(F32.abs(dx), F32.abs(dy))
+
+# Where the icon's point (x, y) starts on the plus.
+def plus_x.at(+dx: F32, +dy: F32) -> F32:
+  Bool.pick(F32, plus_across(dx, dy), (plus_mid() + plus_side(dx) * plus_reach(dx, dy) : F32), plus_mid())
+
+def plus_y.at(+dx: F32, +dy: F32) -> F32:
+  Bool.pick(F32, plus_across(dx, dy), plus_mid(), (plus_mid() + plus_side(dy) * plus_reach(dx, dy) : F32))
+
+def plus_x(+x: F32, +y: F32) -> F32:
+  plus_x.at((x - plus_mid() : F32), (y - plus_mid() : F32))
+
+def plus_y(+x: F32, +y: F32) -> F32:
+  plus_y.at((x - plus_mid() : F32), (y - plus_mid() : F32))
+
+# A point on its way: at p 0 it is on the plus (a), at 1 on the icon (b).
+def mix(+a: F32, +b: F32, +p: F32) -> F32:
+  (a + (b - a) * p : F32)
+
+# The plus arrives turning into place: from plus_in_scale of its size and plus_in_turn degrees away, in
+# plus_in_ms (duration_enter), on ease_spring, plus_in_wait_ms after its ground starts to show.
+def plus_in_ms() -> U32: 360
+def plus_in_wait_ms() -> U32: 60
+def plus_in_scale() -> F32: 0.2
+def plus_in_turn() -> F32: (0.0 - 90.0 : F32)
+
+# It becomes the icon in become_ms (duration_connect), its line opening on ease_in_out. The whole icon
+# gathers first (become_gather of its size, at become_gather_at of the way), comes out a little too big
+# (become_over, at become_over_at) and settles become_settle_ms after the line is done: the landing is the
+# whole icon's, so the shape itself is never bent.
+def become_ms() -> U32: 560
+def become_settle_ms() -> U32: 120
+def become_gather() -> F32: 0.9
+def become_gather_at() -> F32: 0.2
+def become_over() -> F32: 1.12
+def become_over_at() -> F32: 0.72
+
+# ---------- Something new in a side bar (motion.js: arriveNew, settleNew, leaveNew, popIn, makeRoom) ----------
+# Its ground shows in new_in_ms (duration_enter); on the rail, where it is a small square, it also grows from
+# new_in_scale of its size, on ease_spring. A state's dot pops in in pop_ms (duration_enter), on ease_spring.
+# Nothing came of it: it leaves in new_out_ms (2 × duration), to new_out_scale of its size.
+def new_in_ms() -> U32: 360
+def new_in_scale() -> F32: 0.5
+def new_out_ms() -> U32: 240
+def new_out_scale() -> F32: 0.6
+def pop_ms() -> U32: 360
+def room_ms() -> U32: 240                # the room it takes opens, or closes (2 × duration)
+
+# ---------- Words that travel (motion.js: liftWords) ----------
+# The words of a link leave where they were and become a name somewhere else, in words_ms (duration_connect).
+def words_ms() -> U32: 560
+
+# ---------- Stepping back (motion.js: stepBack, stepForward) ----------
+# What a place said goes smaller and fainter toward where that place lives (its button), to step_scale of
+# its size; it leaves in step_back_ms (2 × duration) and comes forward again in step_forward_ms (duration_enter).
+def step_scale() -> F32: 0.94
+def step_back_ms() -> U32: 240
+def step_forward_ms() -> U32: 360
+# What arrives in its place rises arrive_rise px (space_1) while it shows, each piece arrive_stagger_ms after the one before.
+def arrive_rise() -> F32: 4.0
+def arrive_stagger_ms() -> U32: 60
+
+# A label changes its words (motion.js: swapWords): the old ones go in words_out_ms (duration), the new ones
+# come from the side, arrive_rise away.
+def words_out_ms() -> U32: 120
+
+# A small answer (motion.js: nudge): the piece grows to nudge_scale at nudge_at of the way and comes back, in
+# nudge_ms (duration_enter), on ease_spring.
+def nudge_scale() -> F32: 1.14
+def nudge_at() -> F32: 0.4
+def nudge_ms() -> U32: 360

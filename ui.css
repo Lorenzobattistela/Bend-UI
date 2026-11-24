@@ -1380,8 +1380,9 @@ html:not([data-narrow]) .window:not(.is-full) {
    </nav>
    A section is closed unless its toggle has aria-expanded="true"; opening one closes the others in its group
    (the whole side bar without groups), unless the group has data-side-multiple. A child lines up with its
-   parent's text. A closed side bar shows only the sections' icons. ui.js opens and closes. */
-.side__body { flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: var(--space-hairline); }
+   parent's text. A closed side bar shows only the sections' icons. ui.js opens and closes.
+   A section's state: <span class="dot dot--busy" role="img" aria-label="working"></span> in its toggle, after its text. */
+.side__body { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; gap: var(--space-hairline); }
 .side__section, .side__group, .side__items { display: flex; flex-direction: column; gap: var(--space-hairline); }
 .side__group + .side__group { margin-top: var(--space-3); }
 .side__chevron { margin-left: auto; color: var(--text-3); transition: transform var(--duration) var(--ease); }
@@ -1403,6 +1404,22 @@ html:not([data-narrow]) .window:not(.is-full) {
 .side:not(.is-open) .side__more { display: none; }
 .side__section:has(> .side__row > .side__toggle:not([aria-expanded="true"])) > .side__items { display: none; }
 @media (prefers-reduced-motion: reduce) { .side__chevron, .side__more { transition: none; } }
+/* The rail is as wide as one icon button and nothing in it is wider, so it never scrolls sideways: a group's
+   label keeps only the room that sets the group apart, a section's chevron is out, and a section's state (a
+   .dot in its toggle, after its text) sits on its icon's corner, ringed by the ground it is on. */
+.side .side__label { height: calc(var(--space-3) + var(--space-1) + 1lh); overflow: hidden; transition: opacity var(--duration), height calc(var(--duration) * 2) var(--ease), padding calc(var(--duration) * 2) var(--ease); }
+.side:not(.is-open):not(:is([data-narrow] *)) .side__label { height: var(--space-3); padding-block: var(--space-0); }
+.side:not(.is-open):not(:is([data-narrow] *)) .side__chevron { display: none; }
+.side:not(.is-open):not(:is([data-narrow] *)) .side__toggle { position: relative; }
+.side:not(.is-open):not(:is([data-narrow] *)) .side__toggle > .dot { position: absolute; top: var(--space-hairline); right: var(--space-hairline); box-shadow: 0 0 0 var(--space-hairline) var(--surface); }
+.side:not(.is-open):not(:is([data-narrow] *)) .side__toggle:is(:hover, [aria-current="page"]) > .dot { box-shadow: 0 0 0 var(--space-hairline) var(--surface-2); }
+/* Something new being made in the side bar (a section before it has its name): on a soft ground of the accent,
+   and not a button yet. motion.js brings it (arriveNew) and turns it into what it becomes (settleNew). */
+.side .btn.is-new { background: var(--accent-soft); color: var(--accent-text); pointer-events: none; }
+/* Words on their way from one place to another (motion.js: liftWords). */
+.fly-still { position: fixed; z-index: var(--layer-fly); margin: 0; pointer-events: none; }   /* a canvas's picture, standing in for it (holdStill) */
+.fly-words { position: fixed; z-index: var(--layer-fly); margin: 0; display: inline-flex; align-items: center; white-space: nowrap; pointer-events: none; text-underline-offset: var(--space-hairline); }
+@media (prefers-reduced-motion: reduce) { .side .side__label { transition: none; } }
 
 /* ---------- Agent: a face that opens into round options ----------
    Drawn by agent.js (motion in MOTION.bend). The face is the only part that is not a lib component:

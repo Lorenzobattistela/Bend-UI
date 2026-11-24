@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.1.33 (2026-11-24)
+
+Motion between places, approved in the artifact "LawEditor Transition Lab", and a side bar that doesn't scroll sideways when closed.
+
+- **The rail never scrolls sideways.** Closed, a group's label and a section's chevron kept their width out of sight, and `.side__body` scrolled. Now the label keeps only the room that sets its group apart (it grows back as the side bar opens), the chevron is out, and `.side__body` hides what is wider. This changes how a closed side bar with groups looks: the empty room above a group is smaller.
+- **A section's state on the rail.** A `.dot` in a `.side__toggle` sits on the icon's corner while the side bar is closed, ringed by the ground it is on.
+- **`bend-ui/motion`** (opt-in, new): `plusIcon` and `becomeIcon` (a plus that opens into an icon's outline), `arriveNew`, `settleNew`, `leaveNew` (something new in a side bar, `.btn.is-new`), `makeRoom`, `popIn`, `nudge`, `swapWords`, `liftWords` (words that travel and become another element, `.fly-words`), `stepBack`, `stepForward`, `moveFrom`, `arrive`, `holdStill` (`.fly-still`). Their numbers are new in `MOTION.bend` (`plus_*`, `become_*`, `new_*`, `pop_ms`, `room_ms`, `words_*`, `step_*`, `arrive_*`, `nudge_*`). The plus's math has no law: Bend's checker doesn't compute decimals, so it was checked by running it.
+- `setSideSection(section, open)` in `ui.js`: a section opens or closes as a click on its button would, without opening the side bar.
+- `jellyFlight` answers `gathered`, a promise that resolves when Fairy's tentacles are in and it is about to go.
+- The `monitor` icon.
+
 ## 1.1.32 (2026-11-24)
 
 - Fairy's Jelly: `jellyFlight` (`bend-ui/fairy-jelly`) flies Fairy between two places, pulling its tentacles in on the way to a ball or letting them out on the way back, approved in the artifacts "Fairy Tentacles" and "Fairy Morphs". Its numbers are `jelly_*` in `FAIRY_MOTION.bend`.

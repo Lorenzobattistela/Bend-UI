@@ -115,18 +115,21 @@ const EASE = bezier(.2, .8, .2, 1);   // --ease (TOKENS.bend ease)
  * land()). "in" starts as the full fairy and lands as the ball (mountAgent's ball: true); "out" the other way.
  * Until it knows where it goes it stays where it was, doing its Jelly there. `done` runs once it has landed
  * and settled: show the face that waits there then (keep it hidden until). With reduced motion it does
- * nothing and `done` runs at once.
+ * nothing and `done` runs at once. `gathered` resolves when its tentacles are in (out, the other way) and
+ * it is about to go: the beat for what should happen with it.
  */
 export function jellyFlight({ from, to = null, direction = "in", done } = {}) {
   let landed = done, target = to, cancelled = false;
-  let finished = false;
+  let finished = false, gather = null;
+  const gathered = new Promise((r) => { gather = r; });
   const api = {
+    gathered,
     land(el, cb) { target = el; if (cb) landed = cb; if (finished && !cancelled) landed?.(); },   // already done (reduced motion): show it now
     cancel() { cancelled = true; },
     get flying() { return !cancelled && !finished; },
   };
   const start = box(from);
-  if (lessMotion.matches || !start || !start.width) { finished = true; queueMicrotask(() => landed?.()); return api; }
+  if (lessMotion.matches || !start || !start.width) { finished = true; gather(); queueMicrotask(() => landed?.()); return api; }
 
   const k = tentacleKit();
   const goingIn = direction === "in";
@@ -150,10 +153,10 @@ export function jellyFlight({ from, to = null, direction = "in", done } = {}) {
 
   const finish = () => {
     if (finished) return;
-    finished = true; el.remove(); if (!cancelled) landed?.();
+    finished = true; gather(); el.remove(); if (!cancelled) landed?.();
   };
   const draw = (time) => {
-    if (cancelled) { el.remove(); finished = true; return false; }
+    if (cancelled) { el.remove(); finished = true; gather(); return false; }
     const now = performance.now();
     const dt = last === null ? 0 : Math.min(0.05, (now - last) / 1000); last = now;
     // Springs.
@@ -161,7 +164,8 @@ export function jellyFlight({ from, to = null, direction = "in", done } = {}) {
     s.vel += (B.jelly_spring() * (s.target - s.amount) - c * s.vel) * dt;
     s.amount = clamp01(s.amount + s.vel * dt);
     if (Math.abs(s.target - s.amount) < 0.0005 && Math.abs(s.vel) < 0.001) { s.amount = s.target; s.vel = 0; }
-    if (goingIn && s.prev < B.jelly_arrive() && s.amount >= B.jelly_arrive()) { s.qv -= B.jelly_squash(); s.happyUntil = now + B.jelly_smile() * 1000; }
+    if (!goingIn && s.amount === s.target) gather();
+    if (goingIn && s.prev < B.jelly_arrive() && s.amount >= B.jelly_arrive()) { s.qv -= B.jelly_squash(); s.happyUntil = now + B.jelly_smile() * 1000; gather(); }
     s.prev = s.amount;
     const qc = 2 * Math.sqrt(B.jelly_squash_spring()) * B.jelly_squash_damping();
     s.qv += (-B.jelly_squash_spring() * s.q - qc * s.qv) * dt;

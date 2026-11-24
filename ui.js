@@ -259,6 +259,8 @@ function setSection(section, open) {
     sideAnim(items, [{ height: h + "px", opacity: 1 }, { height: "0px", opacity: 0 }]).then(() => { items.style.display = items.style.overflow = ""; });
   }
 }
+// A section opens or closes as a click on its button would do it (without opening the side bar).
+export const setSideSection = (section, open) => setSection(section, open);
 export function setSide(side, open) {
   side.classList.toggle("is-open", open);
   const toggles = sideToggles(side);

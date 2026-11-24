@@ -819,3 +819,26 @@ mountPanesDocs();
 // Inspect extension: a panel to read (measures, a part's values, a pin).
 import { mountInspectDocs } from "./inspect.js";
 mountInspectDocs();
+
+// Side bar: something new is made in it (motion.js). A plus arrives, waits a moment, and opens into the folder.
+import { plusIcon, arriveNew, settleNew, makeRoom } from "../motion.js";
+{
+  const add = document.getElementById("demo-new-add"), group = document.getElementById("demo-new-group");
+  let made = 0;
+  add?.addEventListener("click", async () => {
+    const s = document.createElement("div"); s.className = "side__section";
+    s.innerHTML = '<button class="btn btn--ghost side__toggle is-new" type="button" aria-expanded="false" aria-label="New section"><span class="side__text">New section</span></button><div class="side__items"></div>';
+    const toggle = s.firstChild;
+    toggle.prepend(plusIcon("folder"));
+    group.firstElementChild.after(s); makeRoom(s);
+    await arriveNew(toggle);
+    await new Promise((r) => setTimeout(r, 900));
+    const dot = document.createElement("span");
+    dot.className = "dot dot--busy"; dot.setAttribute("role", "img"); dot.setAttribute("aria-label", "working");
+    const name = "Section " + ++made;
+    toggle.querySelector(".side__text").textContent = name; toggle.setAttribute("aria-label", name);
+    toggle.insertAdjacentHTML("beforeend", '<svg class="icon icon--sm side__chevron" aria-hidden="true"><use href="#i-chevron-down"/></svg>');
+    toggle.querySelector(".side__chevron").before(dot);
+    await settleNew(toggle, { state: dot });
+  });
+}
