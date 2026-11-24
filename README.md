@@ -872,7 +872,11 @@ import { initPane, setPane, setPaneSize } from "bend-ui/panes";
 initPane(pane, { onResize: (size) => save(size), onToggle: (open) => {} });   // adds the grip (.pane__grip)
 setPane(pane, true);       // opens or closes it; a [data-pane-toggle="id"] button does the same
 setPaneSize(pane, 320);    // a size the app kept (null: the default)
+setPaneWhole(pane, true);  // the pane takes the whole body and the column steps aside; false sets it back
 ```
+
+- **Whole**: `setPaneWhole` (`.pane.is-whole`) gives a pane the whole window body, for a page that needs more room without leaving the window; the column beside it steps aside and comes back as it was. `isPaneWhole(pane)` says which.
+- **Tools in the head**: `.pane__tools` holds groups of tools at the start of a pane's head (pills, a switch), a step apart; `.pane__actions` keeps the ones at its end.
 
 - **Size**: a side pane opens `pane_width` wide (256) and is never under `pane_min` (192), and the column keeps `pane_col_min` (320); a pane under the column opens `pane_under_height` tall (160), at least `pane_under_min` (96), leaving the column `pane_page_min` (128). `PANES.bend`'s `clamp_width(wanted, room)` and `clamp_height` decide.
 - **Grip**: drag the pane's inner edge with a mouse, a pen or a finger. It is a `role="separator"` that takes the focus: Left and Right (Up and Down under the column) step it by `pane_step` (16), Home and End take it to its smallest and largest, and a double click puts the default back. For any size without dragging, offer your own control and call `setPaneSize`.
@@ -969,6 +973,10 @@ legend.innerHTML = key();                       // which color is which space
 ```
 
 A page in a frame: `.inspect-host--fill` holds an `iframe.inspect-frame` with the `.inspect` drawing exactly over it, and `.inspect-out` under it holds what the tools say (the key, the picked part's values).
+
+`groups(readPart(el))` shows the same values grouped as a person reads them: the part and how many values are off the scale first, then Space (padding, gap, margin), Shape (size, corner) and Text (size, weight); four equal sides read as one number, two pairs as two ("13 · 24").
+
+So that turning a tool on never changes the page's size (a page in a frame would lay itself out again and move), put what the tools say over the page, inside the `.inspect-host`: `.inspect-out--float` is a sheet over its bottom, `.inspect-key--float` holds the key in its top corner.
 
 A box is plain numbers (`{ x, y, w, h, pad, margin, rowGap, colGap, kids }` with `pad` and `margin` as `[top, right, bottom, left]`), so a page in a frame can read its own boxes and send them: `draw()` only needs them in the same measures as `at`. A band shows its number when it is at least `inspect_says_across` thick (or `inspect_says_along` wide, for one that stands); room between two children that isn't the part's own gap is not drawn.
 

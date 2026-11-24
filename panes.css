@@ -36,6 +36,8 @@
 }
 .pane__title { margin: 0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: inherit; color: inherit; }
 .pane__actions { flex: none; display: flex; align-items: center; gap: var(--space-hairline); }
+/* Tools at the start of a pane's head: groups of them (pills, a switch) a step apart. */
+.pane__tools { flex: 1; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
 .pane__body { flex: 1; min-height: 0; overflow: auto; padding: var(--space-2); }
 
 /* The grip: on the pane's inner edge, pane_grip across. A line shows on hover, on keyboard focus and while it is dragged. */
@@ -45,6 +47,12 @@
 .pane__grip:focus-visible::after, .pane.is-resizing > .pane__grip::after { background: var(--accent); }
 .pane--under > .pane__grip { top: calc(var(--pane-grip) / -2); bottom: auto; left: 0; right: 0; width: auto; height: var(--pane-grip); cursor: row-resize; }
 .pane--under > .pane__grip::after { top: calc(50% - var(--focus-width) / 2); bottom: auto; left: 0; right: 0; width: auto; height: var(--focus-width); }
+
+/* Whole: the pane takes the whole body, and the column beside it steps aside until it is set back (setPaneWhole).
+   For a page that needs more room without leaving the window. */
+.pane.is-whole { width: auto; flex: 1; max-width: none; border-left: var(--space-0); }
+.window__body:has(> .pane.is-whole) > .window__col { display: none; }
+.pane.is-whole > .pane__grip { display: none; }
 
 /* Narrow: a side pane covers the column as a sheet (as the side bar becomes a drawer). It has no grip. */
 [data-narrow] .pane:not(.pane--under) { position: absolute; z-index: var(--pane-layer); inset: 0; width: auto; min-width: var(--space-0); max-width: none; border-left: var(--space-0); }

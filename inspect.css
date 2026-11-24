@@ -40,3 +40,22 @@
 .inspect-host--fill { flex: 1; min-width: 0; min-height: 0; }
 .inspect-frame { display: block; width: 100%; height: 100%; border: 0; background: var(--bg); }
 .inspect-out { flex: none; display: flex; flex-direction: column; gap: var(--space-3); max-height: var(--inspect-out-share); overflow-y: auto; padding: var(--space-3); border-top: var(--border-width) solid var(--border); }
+
+/* A part's values, grouped (groups()): the part and what is off the scale, then Space, Shape and Text, each a
+   title over its rows, the rows in from the title. Wraps into columns when there is room. */
+.inspect-groups { display: flex; flex-direction: column; gap: var(--space-3); }
+.inspect-groups__head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-2); }
+.inspect-groups__head .tag { flex: none; white-space: nowrap; }
+.inspect-groups__part { min-width: 0; font-family: var(--font-mono); overflow-wrap: anywhere; }
+.inspect-groups__body { display: flex; flex-wrap: wrap; gap: var(--space-3) var(--space-5); }
+.inspect-groups__group { flex: 1 1 calc(var(--space-8) * 3); display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; }
+.inspect-groups__row { display: grid; grid-template-columns: calc(var(--space-8) + var(--space-2)) minmax(0, 1fr); align-items: center; gap: var(--space-2); padding-left: var(--space-2); font-size: var(--text-sm); }
+.inspect-groups__name { color: var(--text-detail); }
+.inspect-groups__val { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1); min-width: 0; font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.inspect-groups__dot { color: var(--text-detail); }
+
+/* Over the page instead of under it, so turning a tool on never changes the page's size (the page in the frame
+   would lay itself out again and move). --float: what the tools say, a sheet over the page's bottom. */
+.inspect-out--float { position: absolute; z-index: calc(var(--inspect-layer) + 1); left: var(--space-3); right: var(--space-3); bottom: var(--space-3); max-height: var(--inspect-out-share); border-top: 0; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow-float); }
+/* The key, in the page's top corner. */
+.inspect-key--float { position: absolute; z-index: calc(var(--inspect-layer) + 1); top: var(--space-3); right: var(--space-3); padding: var(--space-1) var(--space-2); border-radius: var(--radius-full); background: var(--surface); box-shadow: var(--shadow-float); }

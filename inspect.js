@@ -1,5 +1,5 @@
 // Inspect (opt-in): import "bend-ui/inspect".
-//   import { readBoxes, readPart, draw, facts, key, nameOf, tokenName } from "bend-ui/inspect";
+//   import { readBoxes, readPart, draw, facts, groups, key, nameOf, tokenName } from "bend-ui/inspect";
 // What is drawn over a piece of interface to read it: its padding, margins and gaps with their numbers, the part under
 // the pointer, the part picked, a pin where a comment points. INSPECT.bend decides every band and names every
 // value on the scale; this file reads the boxes from the page and draws what Bend returns.
@@ -93,6 +93,25 @@ export function draw(layer, { boxes = [], at: o = { x: 0, y: 0 }, hover = null, 
 
 // The key: which color is which space.
 export const key = () => `<span class="inspect-key">${[["pad", "padding"], ["margin", "margin"], ["gap", "gap"]].map(([k, name]) => `<span class="inspect-key__item"><i class="inspect-key__mark inspect-key__mark--${k}"></i>${name}</span>`).join("")}</span>`;
+
+// A part's values (readPart), grouped as a person reads them: the part and whether any value is off the scale
+// first, then Space (padding, gap, margin), Shape (size, corner) and Text (size, weight). Four equal sides say one
+// number, two pairs say two ("13 · 24"). Each number has its token, or "off the scale".
+export function groups(part) {
+  const off = (n, kind = "space") => n > 0 && !tokenName(Math.round(n * 10) / 10, kind);
+  const short = (a) => (a[0] === a[2] && a[1] === a[3] ? (a[0] === a[1] ? [a[0]] : [a[0], a[1]]) : a);
+  const vals = (ns, kind = "space") => ns.map((n) => value(n, kind)).join('<span class="inspect-groups__dot">·</span>');
+  const row = (name, html) => `<div class="inspect-groups__row"><span class="inspect-groups__name">${name}</span><span class="inspect-groups__val">${html}</span></div>`;
+  const group = (title, rows) => (rows ? `<div class="inspect-groups__group"><h4 class="group-title">${title}</h4>${rows}</div>` : "");
+  const pad = part.pad || [0, 0, 0, 0], margin = part.margin || [0, 0, 0, 0];
+  const count = [...new Set(pad)].filter((n) => off(n)).length + [...new Set(margin)].filter((n) => off(n)).length + (off(part.gap) ? 1 : 0) + (off(part.radius, "radius") ? 1 : 0);
+  const space = (pad.some(Boolean) ? row("Padding", vals(short(pad))) : "") + (part.gap ? row("Gap", vals([part.gap])) : "") + (margin.some(Boolean) ? row("Margin", vals(short(margin))) : "");
+  const shape = row("Size", `${Math.round(part.w)} × ${Math.round(part.h)}`) + (part.radius ? row("Corner", vals([part.radius], "radius")) : "");
+  const text = row("Size", num(part.size) + "px") + row("Weight", esc(part.weight));
+  return `<div class="inspect-groups"><div class="inspect-groups__head"><span class="section-title inspect-groups__part">${esc(part.name)}</span>`
+    + (count ? `<span class="tag tag--warning">${count} off the scale</span>` : `<span class="tag tag--success">on the scale</span>`) + `</div>`
+    + `<div class="inspect-groups__body">${group("Space", space)}${group("Shape", shape)}${group("Text", text)}</div></div>`;
+}
 
 // A part's values (readPart), as rows: each space and corner with its token, or "off the scale".
 export function facts(part) {

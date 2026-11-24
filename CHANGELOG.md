@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.35 (2026-11-24)
+
+For a page read inside an app (LawEditor's Page studio, approved in the artifact "LawEditor Page Studio Lab"). Only adds: no existing component, token or law changes.
+
+- **`groups(part)`** in `bend-ui/inspect`: a part's values grouped as a person reads them. The part and how many values are off the scale come first, then Space (padding, gap, margin), Shape (size, corner) and Text (size, weight). Four equal sides read as one number and two pairs as two ("13 · 24"), each with its token or "off the scale". `facts()` stays as it was.
+- **What the tools say floats over the page**: `.inspect-out--float` (a sheet over the page's bottom) and `.inspect-key--float` (the key in its top corner), inside the `.inspect-host`. Turning a tool on no longer changes the page's size, so a page in a frame doesn't lay itself out again and move.
+- **`setPaneWhole(pane, on)`** and `isPaneWhole` in `bend-ui/panes` (`.pane.is-whole`): the pane takes the whole window body and the column beside it steps aside, until it is set back.
+- **`.pane__tools`**: groups of tools at the start of a pane's head, a step apart.
+
 ## 1.1.34 (2026-11-24)
 
 - **`bend-ui/paywall`** (opt-in, new), approved in the artifact "Perks e Customização": the sheet that opens over an app and says what a plan gives. A title, the price with a monthly / yearly switch, the things you get (a title and what it does, each check drawing itself in turn), one action and a note. Glass, with three balls brushing its top corner that drift and lean toward the pointer; the action and the checks stay solid. It closes with its X, Escape or a click around it, takes the focus when it opens and gives it back when it closes.

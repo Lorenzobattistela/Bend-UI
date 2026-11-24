@@ -117,6 +117,13 @@ export function setPaneSize(pane, size) {
   if (own) own.set(size); else pane.style.setProperty("--pane-size", px(P.clamp(isUnder(pane), Math.max(0, Math.round(size)), paneRoom(pane))));
 }
 
+// setPaneWhole(pane, true): the pane takes the whole body and the column beside it steps aside; false sets it
+// back at the size it had. The pane stays open either way.
+export function setPaneWhole(pane, whole) {
+  pane.classList.toggle("is-whole", !!whole);
+}
+export const isPaneWhole = (pane) => pane.classList.contains("is-whole");
+
 export function setPane(pane, open) {
   if (!pane.hidden === open) return;
   const under = isUnder(pane), sheet = isSheet(pane), toggles = paneToggles(pane);
