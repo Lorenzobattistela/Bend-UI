@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.32 (2026-11-24)
+
+- Fairy's Jelly: `jellyFlight` (`bend-ui/fairy-jelly`) flies Fairy between two places, pulling its tentacles in on the way to a ball or letting them out on the way back, approved in the artifacts "Fairy Tentacles" and "Fairy Morphs". Its numbers are `jelly_*` in `FAIRY_MOTION.bend`.
+- The ball: `mountAgent(..., { ball: true })` and `fairyBall` in `bend-ui/fairy`, the sphere grown 14% with the same eyes, filling the face.
+- The start centers what is seen: a Fairy face on `.chat__start` takes margins for its filaments (`fairy_start_above`, `fairy_start_below`) instead of being pushed up by `fairy_start_offset` (removed).
+- The window's margin no longer leaks out of the page: `body` holds it (`display: flow-root`), so a page with `.window` doesn't scroll by 24 px.
+
 ## 1.1.31 (2026-11-21)
 
 - Size Fairy by its spherical body so it matches the classic agent ball at every size. Keep the start screen filaments above the composer without changing the page layout.

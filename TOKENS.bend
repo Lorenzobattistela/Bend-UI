@@ -356,5 +356,11 @@ def fairy_canvas_size() -> String: "243.902439%"
 def fairy_canvas_offset() -> String: "-71.9512195%"
 def fairy_surface() -> String: "transparent"
 
-# Keep the larger filaments clear of the start composer without moving the composer.
-def fairy_start_offset() -> String: "-121.9512195%"
+# On the chat's start, the face's box makes room for the filaments it draws, in faces: above the sphere
+# (31.5 - 7.6 = 23.9 units of 41) and below it (92 - 72.5 = 19.5 of 41). The start centers what is seen.
+def fairy_start_above() -> String: "0.583"
+def fairy_start_below() -> String: "0.476"
+# The ball (its tentacles in, the body grown by jelly_grow): its canvas sized so the ball fills the face.
+# 100 / (41 * 1.14) and half of what is left over.
+def fairy_ball_canvas_size() -> String: "213.947752%"
+def fairy_ball_canvas_offset() -> String: "-56.973876%"

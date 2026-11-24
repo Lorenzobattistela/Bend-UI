@@ -8,6 +8,7 @@
 [hidden] { display: none !important; }
 
 body {
+  display: flow-root;          /* holds the window's margin: without it the top margin leaks out and the page scrolls by it */
   margin: 0;
   background: var(--bg);
   color: var(--text);
@@ -1481,4 +1482,12 @@ html:not([data-narrow]) .window:not(.is-full) {
 .agent--fairy .agent__face, .agent__face--fairy { background: var(--fairy-surface); box-shadow: none; overflow: visible; }
 .agent__fairy { display: block; position: absolute; inset: var(--fairy-canvas-offset); width: var(--fairy-canvas-size); height: var(--fairy-canvas-size); pointer-events: none; }
 
-.chat__start .agent__fairy { top: var(--fairy-start-offset); }
+/* On the start, the face's box makes room for the filaments it draws, so the start centers what is seen
+   and the filaments stay clear of the composer. */
+.chat__start .agent--fairy { margin-top: calc(var(--agent-face) * var(--fairy-start-above)); margin-bottom: calc(var(--agent-face) * var(--fairy-start-below)); }
+/* The ball: Fairy with its tentacles in (mountAgent's ball), filling the face. */
+.agent--ball .agent__fairy { inset: var(--fairy-ball-canvas-offset); width: var(--fairy-ball-canvas-size); height: var(--fairy-ball-canvas-size); }
+/* jellyFlight: the fairy between two places, over the page. */
+.fairy-flight { position: fixed; left: 0; top: 0; pointer-events: none; z-index: var(--layer-fly); transform-origin: 0 0; will-change: transform; }
+.fairy-flight > * { position: absolute; inset: 0; }
+.fairy-flight__tentacles { width: 100%; height: 100%; }

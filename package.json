@@ -1,6 +1,6 @@
 {
   "name": "bend-ui",
-  "version": "1.1.31",
+  "version": "1.1.32",
   "description": "Design system in Bend: tokens in TOKENS.bend, rules in LAWS.bend.",
   "type": "module",
   "main": "ui.js",
@@ -45,6 +45,7 @@
     "./PATCH.bend": "./PATCH.bend",
     "./page/*": "./page/*",
     "./fairy": "./fairy.js",
+    "./fairy-jelly": "./fairy-jelly.js",
     "./FAIRY.bend": "./FAIRY.bend",
     "./FAIRY_MOTION.bend": "./FAIRY_MOTION.bend"
   },
@@ -103,6 +104,7 @@
     "WEB_PROOF.bend",
     "page",
     "fairy.js",
+    "fairy-jelly.js",
     "fairy-renderer",
     "FAIRY.bend",
     "FAIRY_MOTION.bend",

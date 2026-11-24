@@ -510,6 +510,12 @@ Fairy adds `setState("idle" | "thinking" | "working" | "waiting" | "blocked" | "
 
 Its approved contour lives in `FAIRY.bend`, with a spherical core (equal 20.5-unit radii), circular filaments and vivid teal `--fairy-color` (`#00d6b5`). `agent_sm/lg/xl` measures its spherical body, matching the classic ball; filaments extend around it. Override that token locally to recolor the avatar. `FAIRY_MOTION.bend` and `FAIRY_ANIMATOR.bend` own easing, poses and interrupted transitions. The licensed Open Bot Avatar renderer draws the volume to canvas; browser modules handle input, layout and rendering.
 
+`mountAgent(el, { avatar: "fairy", ball: true, size: "sm" })` is the ball: Fairy with its tentacles in, its sphere grown by `jelly_grow` (14%) and the same eyes, filling the face (`.agent--ball`). A chat's face beside its replies.
+
+`jellyFlight({ from, to, direction, done })` (`import { jellyFlight } from "bend-ui/fairy-jelly"`) flies Fairy over the page between two `.agent__fairy`, pulling its tentacles in (`"in"`, landing as the ball) or letting them out (`"out"`). It reaches up, pulls them in, squashes on its base and smiles; letting go, it pops. `to` can come later with `flight.land(el, done)`: until then it does its Jelly where it was. Keep the face that waits there hidden until `done`; `flight.cancel()` drops it. With reduced motion it does nothing and `done` runs at once. The body and eyes are the renderer's (the eyes never change size); the tentacles are `FAIRY.bend`'s outline drawn as tubes that slide back along their own path. Every number is `FAIRY_MOTION.bend`'s `jelly_*`.
+
+On `.chat__start`, a Fairy face's box makes room for the filaments it draws (`--fairy-start-above`, `--fairy-start-below`), so the start centers what is seen and the filaments stay clear of the composer.
+
 In a page written with `Web.bend`, import `UI.bend` and render:
 
 ```python

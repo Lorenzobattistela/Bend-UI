@@ -161,3 +161,24 @@ def turn_done(ms: F32) -> Bool: (ms >= 420.0 : F32)
 def shake_angle(ms: F32) -> F32:
   +t = clamp((ms / 420.0 : F32))
   (F32.sin((t * tau() * 3.0 : F32)) * 0.12 * (1.0 - t) : F32)
+
+# Jelly (bend-ui/fairy-jelly): the fairy pulls its tentacles in on its way from the start to the chat,
+# and lets them out on the way back. Approved in the artifact "Fairy Morphs" (2026-11-24).
+# The tentacles' spring (stiffness, damping ratio), and how much the longer ones start first.
+def jelly_spring() -> F32: 150.0
+def jelly_damping() -> F32: 0.85
+def jelly_stagger() -> F32: 0.12
+# The body alone grows this much once they are in; the eyes keep their size.
+def jelly_grow() -> F32: 0.14
+# A reach up before pulling in; the squash on its base when the last one is in, keeping its volume;
+# a pop when it lets them go (a share of the squash); the squash's own spring.
+def jelly_reach() -> F32: 2.6
+def jelly_squash() -> F32: 2.6
+def jelly_keep_volume() -> F32: 0.7
+def jelly_let_go() -> F32: 0.45
+def jelly_squash_spring() -> F32: 210.0
+def jelly_squash_damping() -> F32: 0.3
+def jelly_arrive() -> F32: 0.985
+# Happy eyes after the squash, and the flight between the start and the chat, in seconds.
+def jelly_smile() -> F32: 0.9
+def jelly_travel() -> F32: 0.64

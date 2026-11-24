@@ -36,6 +36,7 @@ export function mountAgent(root, opts = {}) {
 
   root.classList.add("agent", "agent--" + size);
   root.classList.toggle("agent--fairy", isFairy);
+  root.classList.toggle("agent--ball", isFairy && !!opts.ball);   // Fairy with its tentacles in
   const faceContent = isFairy ? '<span class="agent__fairy"></span>' : '<i class="agent__eye"></i><i class="agent__eye"></i>';
   // still: a face that only looks. It opens nothing, so it takes no focus and screen readers skip it.
   root.classList.toggle("agent--still", !!opts.still);
@@ -51,7 +52,7 @@ export function mountAgent(root, opts = {}) {
       `</button>`).join("");
 
   const face = root.querySelector(".agent__face");
-  const fairy = isFairy ? mountFairy(face.firstElementChild, { state: opts.state, mood: opts.mood, reducedMotion: opts.reducedMotion }) : null;
+  const fairy = isFairy ? mountFairy(face.firstElementChild, { state: opts.state, mood: opts.mood, reducedMotion: opts.reducedMotion, ball: !!opts.ball }) : null;
   face.classList.toggle("agent__face--fairy", isFairy);
   const eyes = [...root.querySelectorAll(".agent__eye")];
   const items = [...root.querySelectorAll(".agent__item")];

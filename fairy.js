@@ -10,11 +10,20 @@ export const fairy = Object.freeze({
   eyes: { x: 50, y: F.eye_y(), spacing: F.eye_spacing(), scale: F.eye_scale() },
 });
 
+// The ball: Fairy with its tentacles in, its sphere grown by jelly_grow, the same eyes (and the same id,
+// so the same motion). What jellyFlight lands on beside a chat's reply.
+const ballR = F.radius() * (1 + B.jelly_grow()), ballY = F.center_y();
+export const fairyBall = Object.freeze({
+  ...fairy,
+  body: { path: `M50 ${ballY - ballR}A${ballR} ${ballR} 0 1 1 50 ${ballY + ballR}A${ballR} ${ballR} 0 1 1 50 ${ballY - ballR}Z` },
+});
+
 // A decorative canvas inside mountAgent's accessible face button.
 export function mountFairy(host, options = {}) {
+  const { ball, ...rest } = options;
   const avatar = mountAvatar(host, {
-    definition: fairy, color: "var(--fairy-color)", eyeColor: "var(--fairy-ink)",
-    followPointer: true, label: "", ...options,
+    definition: ball ? fairyBall : fairy, color: "var(--fairy-color)", eyeColor: "var(--fairy-ink)",
+    followPointer: true, label: "", ...rest,
   });
   let gesture = null;
   return {
