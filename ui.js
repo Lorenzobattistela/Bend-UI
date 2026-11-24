@@ -47,6 +47,8 @@ const VARS = {
   "--side-padding": () => px(T.side_padding()), "--side-rail": () => px(T.side_rail()), "--side-width": () => px(T.side_width()),
   "--window-margin": () => px(T.window_margin()), "--avatar-size": () => px(T.avatar_size()), "--avatar-overlap": () => px(T.avatar_overlap()), "--avatar-ring": () => px(T.avatar_ring()), "--window-max": () => px(T.window_max()),
   "--fairy-color": () => T.fairy_color(), "--fairy-ink": () => T.fairy_ink(),
+  "--skill": () => T.color_skill(), "--skill-ring-ms": () => T.skill_ring_ms() + "ms", "--skill-burst-ms": () => T.skill_burst_ms() + "ms",
+  "--skill-burst-scale": () => String(T.skill_burst_scale() / 100), "--skill-ring-width": () => String(T.skill_ring_width()), "--skill-burst-width": () => String(T.skill_burst_width()), "--fairy-ball-center": () => T.fairy_ball_center(),
   "--fairy-canvas-size": () => T.fairy_canvas_size(), "--fairy-canvas-offset": () => T.fairy_canvas_offset(), "--fairy-start-above": () => T.fairy_start_above(), "--fairy-start-below": () => T.fairy_start_below(),
   "--fairy-ball-canvas-size": () => T.fairy_ball_canvas_size(), "--fairy-ball-canvas-offset": () => T.fairy_ball_canvas_offset(), "--fairy-surface": () => T.fairy_surface(),
   "--agent-sm": () => px(T.agent_sm()), "--agent-lg": () => px(T.agent_lg()), "--agent-xl": () => px(T.agent_xl()),
@@ -106,7 +108,7 @@ const LIGHT = {
   "--warning": T.color_warning(), "--warning-soft": T.color_warning_soft(), "--warning-text": T.color_warning_text(),
   "--danger": T.color_danger(), "--danger-soft": T.color_danger_soft(),
   // In light, words in a tone are the tone itself (color_accent_text, color_danger_text), so an app's accent carries.
-  "--accent-text": "var(--accent)", "--danger-text": "var(--danger)",
+  "--accent-text": "var(--accent)", "--danger-text": "var(--danger)", "--skill-text": T.color_skill_text(),
   "--shadow-float": T.shadow_float(), "--shadow-drop": T.shadow_drop(),
   // Chart tones: 2 steps toward the surface, 3 and 4 toward the text.
   "--chart-tone-2": T.chart_tone_2() + "%", "--chart-tone-3": T.chart_tone_3() + "%", "--chart-tone-4": T.chart_tone_4() + "%",
@@ -120,7 +122,7 @@ const DARK = {
   "--bg": T.dark_bg(), "--surface": T.dark_surface(), "--surface-2": T.dark_surface_2(),
   "--border": T.dark_border(), "--border-strong": T.dark_border_strong(),
   "--text": T.dark_text(), "--text-2": T.dark_text_2(), "--text-3": T.dark_text_3(), "--text-detail": T.dark_text_detail(),
-  "--accent-text": T.dark_accent_text(), "--accent-soft": T.dark_accent_soft(),
+  "--accent-text": T.dark_accent_text(), "--accent-soft": T.dark_accent_soft(), "--skill-text": T.dark_skill_text(),
   "--success-soft": T.dark_success_soft(), "--success-text": T.dark_success_text(),
   "--warning-soft": T.dark_warning_soft(), "--warning-text": T.dark_warning_text(),
   "--danger-text": T.dark_danger_text(), "--danger-soft": T.dark_danger_soft(),

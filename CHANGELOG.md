@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.1.36 (2026-11-24)
+
+A skill the chat used, for LawEditor's chat (approved in the artifact "LawEditor Fairy Holds the Skill"). Only adds: no existing component, token or law changes.
+
+- **`--skill`**, a color of its own for skills: purple (`color_skill`), with `--skill-text` for words in light and dark (`color_skill_text`, `dark_skill_text`).
+- **`.turn__row--skill`**: the line "Used skill <name>" in the skill's purple (`.skill__said`, `.skill__name`). With `.is-new` it shows itself in.
+- **`.agent__skill`**: a thin purple ring, put in an `.agent`, that goes round it once (`--skill-ring-ms`, 800 ms) and bursts (`--skill-burst-ms`, 380 ms, opening to `--skill-burst-scale`). It sits on the fairy ball's own center (`--fairy-ball-center`, 54.3% down the face). Without motion it shows nothing.
+
 ## 1.1.35 (2026-11-24)
 
 For a page read inside an app (LawEditor's Page studio, approved in the artifact "LawEditor Page Studio Lab"). Only adds: no existing component, token or law changes.

@@ -1203,6 +1203,14 @@ html:has(.page-center), html:has(.page-center) :is(body, .page) { height: 100%; 
 .turn__row--sm { font-size: var(--text-sm); line-height: var(--leading-ui); color: var(--text-2); }
 .turn__mark { height: 1lh; display: flex; align-items: center; justify-content: center; color: var(--text-3); }
 .turn__mark > .plan__step { gap: var(--space-0); }
+/* A skill the chat used: "Used skill <name>", in the skill's purple, nothing else.
+   <div class="turn__row turn__row--sm turn__row--skill"><div class="turn__mark"></div><div class="turn__main"><div class="turn__line"><span class="skill__said">Used skill</span><span class="skill__name">Hear rules</span></div></div></div> */
+.turn__row--skill { color: var(--skill-text); }
+.turn__row--skill .turn__line { flex-wrap: nowrap; white-space: nowrap; overflow: hidden; }
+.skill__said { flex: none; }
+.skill__name { flex: none; font-weight: var(--weight-semibold); }
+.turn__row--skill.is-new .turn__line { animation: skill-said var(--skill-burst-ms) var(--ease) both; }
+@keyframes skill-said { from { opacity: 0; transform: scale(.92); } 60% { opacity: 1; transform: scale(1.04); } }
 .turn__mark--success { color: var(--success-text); }
 .turn__mark--warning { color: var(--warning-text); }
 .turn__main { min-width: 0; display: flex; flex-direction: column; gap: var(--space-2); }
@@ -1425,6 +1433,18 @@ html:not([data-narrow]) .window:not(.is-full) {
    Drawn by agent.js (motion in MOTION.bend). The face is the only part that is not a lib component:
    the options are .btn.btn--round, the labels are .meta, the states are .status-ring. */
 .agent { position: relative; width: var(--agent-face); height: var(--agent-face); flex: none; }
+/* A skill used: a thin purple ring goes round the agent once and bursts (the page adds it, it takes itself away).
+   <svg class="agent__skill" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" pathLength="100"/></svg>, in .agent.
+   It sits on the ball's own center, which is the face's --agent-center down. */
+.agent__skill { position: absolute; z-index: var(--layer-part); left: 50%; top: var(--agent-center, 50%); width: calc(var(--agent-face) + var(--space-3)); height: calc(var(--agent-face) + var(--space-3)); transform: translate(-50%, -50%); pointer-events: none; overflow: visible;
+  animation: skill-burst var(--skill-burst-ms) var(--ease) var(--skill-ring-ms) both; }
+.agent__skill circle { fill: none; stroke: var(--skill); stroke-width: var(--skill-ring-width); stroke-linecap: round; transform-origin: center; transform: rotate(-90deg);
+  animation: skill-ring var(--skill-ring-ms) var(--ease-in-out) both, skill-thin var(--skill-burst-ms) linear var(--skill-ring-ms) both; }
+.agent--ball, .msg__face .agent--fairy { --agent-center: var(--fairy-ball-center); }
+@keyframes skill-ring { from { stroke-dasharray: 0 100; } to { stroke-dasharray: 100 0; } }
+@keyframes skill-thin { from { stroke-width: var(--skill-burst-width); } to { stroke-width: .5; } }
+@keyframes skill-burst { to { opacity: 0; transform: translate(-50%, -50%) scale(var(--skill-burst-scale)); } }
+@media (prefers-reduced-motion: reduce) { .agent__skill, .agent__skill circle, .turn__row--skill.is-new .turn__line { animation: none; } .agent__skill { opacity: 0; } }
 .agent--sm { --agent-face: var(--agent-sm); }
 .agent--lg { --agent-face: var(--agent-lg); }
 .agent__face {

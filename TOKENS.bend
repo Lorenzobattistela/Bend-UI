@@ -348,6 +348,19 @@ def dark_syntax_name() -> String: "#d2a8ff"
 def dark_syntax_added() -> String: dark_success_text()
 def dark_syntax_removed() -> String: dark_danger_text()
 
+# A skill the chat used: its own color, purple, apart from the accent. The line "Used skill <name>" is
+# written in it, and a thin ring of it goes round the agent once and bursts.
+def color_skill() -> String: "#7c4dff"
+def color_skill_text() -> String: "#6a3cf0"
+def dark_skill_text() -> String: "#a98bff"
+def skill_ring_ms() -> U32: 800        # the ring goes round the agent once
+def skill_burst_ms() -> U32: 380       # then it bursts
+def skill_burst_scale() -> U32: 145    # how far it opens as it bursts, in percent of its size
+def skill_ring_width() -> U32: 2       # the ring's stroke, in its 100-wide drawing
+def skill_burst_width() -> U32: 4      # its stroke at the start of the burst
+# The fairy's ball sits a little below the middle of its face: its center, down the face (FAIRY.bend).
+def fairy_ball_center() -> String: "54.3%"
+
 # Fairy agent: vivid teal and the canvas within the existing face slot.
 def fairy_color() -> String: "#00d6b5"
 def fairy_ink() -> String: "#151515"
