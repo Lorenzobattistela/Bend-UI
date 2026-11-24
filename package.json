@@ -1,6 +1,6 @@
 {
   "name": "bend-ui",
-  "version": "1.1.33",
+  "version": "1.1.34",
   "description": "Design system in Bend: tokens in TOKENS.bend, rules in LAWS.bend.",
   "type": "module",
   "main": "ui.js",
@@ -38,6 +38,9 @@
     "./inspect": "./inspect.js",
     "./inspect.css": "./inspect.css",
     "./INSPECT.bend": "./INSPECT.bend",
+    "./paywall": "./paywall.js",
+    "./paywall.css": "./paywall.css",
+    "./PAYWALL.bend": "./PAYWALL.bend",
     "./web": "./web.js",
     "./web-driver": "./web-driver.js",
     "./Web.bend": "./Web.bend",
@@ -94,6 +97,11 @@
     "inspect.js",
     "inspect.css",
     "INSPECT.bend",
+    "paywall.js",
+    "paywall.css",
+    "PAYWALL.bend",
+    "PAYWALL_LAWS.bend",
+    "PAYWALL_PROOF.bend",
     "TREE.bend",
     "TERM.bend",
     "web.js",
@@ -115,7 +123,7 @@
     "test"
   ],
   "scripts": {
-    "check": "bend PROOF.bend && bun board-check.js && bend FAIRY.bend --check-only && bend FAIRY_MOTION.bend --check-only && bend FAIRY_ANIMATOR.bend --check-only && bun fairy-check.js",
+    "check": "bend PROOF.bend && bend PAYWALL_PROOF.bend && bun board-check.js && bend FAIRY.bend --check-only && bend FAIRY_MOTION.bend --check-only && bend FAIRY_ANIMATOR.bend --check-only && bun fairy-check.js",
     "docs": "bun docs/read-laws.js && cd docs && bun index.html",
     "site": "bun docs/read-laws.js && rm -rf site && bend docs/index.html -o site && cp docs/404.html site/404.html"
   }

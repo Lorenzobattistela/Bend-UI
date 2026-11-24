@@ -156,6 +156,7 @@ const FILES = {
   panes: ["PANES.bend", "panes.css", "panes.js"], tree: ["TREE.bend", "PANES.bend", "panes.css", "panes.js"],
   terminal: ["TERM.bend", "panes.css", "panes.js"], strip: ["panes.css"],
   inspect: ["INSPECT.bend", "inspect.css", "inspect.js"],
+  paywall: ["PAYWALL.bend", "PAYWALL_LAWS.bend", "paywall.css", "paywall.js"],
 };
 // Code: the README's own snippets, so the docs and the README never disagree.
 // Each page shows the code blocks under its README heading (## or ###), colored in their own language (SYNTAX.bend).
@@ -179,6 +180,7 @@ const README_OF = {
   page: "Page, doc and pair", pair: "Page, doc and pair", thread: "Thread",
   section: "Page head and sections", dropdown: "Dropdown", board: "Board extension (1.1.11)",
   inspect: "Inspect extension (1.1.29)",
+  paywall: "Paywall extension (1.1.34)",
 };
 const section = (title, ...kids) => {
   const s = document.createElement("section"); s.className = "section";
@@ -819,6 +821,12 @@ mountPanesDocs();
 // Inspect extension: a panel to read (measures, a part's values, a pin).
 import { mountInspectDocs } from "./inspect.js";
 mountInspectDocs();
+
+// Paywall extension: a page written with Web.bend (docs/paywall.bend) keeps the sheet in its state.
+import { mount as mountBend } from "../web.js";
+import { focusSheet } from "../paywall.js";
+import PaywallDemo from "./paywall.bend";
+{ const spot = document.getElementById("paywall-demo"); if (spot) mountBend(spot, PaywallDemo, { patched: focusSheet }); }
 
 // Side bar: something new is made in it (motion.js). A plus arrives, waits a moment, and opens into the folder.
 import { plusIcon, arriveNew, settleNew, makeRoom } from "../motion.js";

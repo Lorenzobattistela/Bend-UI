@@ -1,0 +1,105 @@
+/* Paywall (opt-in: import "bend-ui/paywall"): the sheet that opens over an app and says what a plan gives.
+   PAYWALL.bend draws the tree (with Web.bend) and holds every measure; paywall.js writes each as a CSS variable.
+   The sheet is glass with balls brushing its top corner; the action and the checks stay solid.
+   Existing components keep their definitions and appearance. */
+
+/* The sheet's ground: the app stays in sight, lightly blurred. Closed, nothing takes the pointer. */
+.paywall { position: absolute; inset: 0; z-index: var(--paywall-layer); display: grid; place-items: center; padding: var(--space-5); overflow: hidden;
+  opacity: 0; pointer-events: none; transition: opacity calc(var(--paywall-open-ms) * .6) ease; }
+.paywall.is-open { opacity: 1; pointer-events: auto; }
+.paywall__ground { position: absolute; inset: 0; background: rgb(220 226 236 / .18); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
+[data-theme="dark"] .paywall__ground { background: rgb(8 9 11 / .3); }
+
+/* The sheet: glass, a light from above, shadows in layers. It rises into place. */
+.paywall__sheet { position: relative; width: min(var(--paywall-width), 100%); max-height: 100%; overflow: hidden; isolation: isolate; border-radius: var(--paywall-radius); color: var(--text); font-family: var(--font-sans);
+  background: linear-gradient(150deg, rgb(255 255 255 / .42), rgb(255 255 255 / .22));
+  backdrop-filter: blur(var(--paywall-blur)) saturate(1.9); -webkit-backdrop-filter: blur(var(--paywall-blur)) saturate(1.9);
+  border: var(--border-width) solid rgb(255 255 255 / .75);
+  box-shadow: 0 30px 70px -24px rgb(30 40 70 / .35), 0 2px 8px rgb(30 40 70 / .08), inset 0 1px 0 rgb(255 255 255 / .9), inset 0 -1px 0 rgb(255 255 255 / .25);
+  transform: translateY(16px) scale(.96); transition: transform var(--paywall-open-ms) cubic-bezier(.2, .9, .2, 1.12); }
+.paywall.is-open .paywall__sheet { transform: none; }
+.paywall__sheet::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none; background: linear-gradient(160deg, rgb(255 255 255 / .3) 0%, rgb(255 255 255 / 0) 40%); }
+[data-theme="dark"] .paywall__sheet { background: linear-gradient(150deg, rgb(40 44 56 / .45), rgb(20 22 28 / .3)); border-color: rgb(255 255 255 / .14);
+  box-shadow: 0 40px 80px -24px rgb(0 0 0 / .7), inset 0 1px 0 rgb(255 255 255 / .14), inset 0 0 0 1px rgb(255 255 255 / .07); }
+[data-theme="dark"] .paywall__sheet::before { background: linear-gradient(160deg, rgb(255 255 255 / .1) 0%, rgb(255 255 255 / 0) 40%); }
+
+/* The balls: inside the sheet, cut by its edge, only in the top corner. Each drifts on its own path and leans
+   toward the pointer (--mx, --my from PAYWALL.bend's `leaned`), the nearest the most. */
+.paywall__balls { position: absolute; inset: 0; z-index: 0; overflow: hidden; border-radius: inherit; pointer-events: none;
+  -webkit-mask-image: radial-gradient(120% 90% at 100% 0%, #000 30%, transparent 75%); mask-image: radial-gradient(120% 90% at 100% 0%, #000 30%, transparent 75%); }
+.paywall__ball { position: absolute; border-radius: 50%; filter: blur(26px); opacity: var(--o, .85);
+  transform: translate(calc(var(--mx, 0) * var(--paywall-lean) * var(--d, 1)), calc(var(--my, 0) * var(--paywall-lean) * var(--d, 1))); transition: transform 600ms cubic-bezier(.2, .8, .2, 1); }
+.paywall__ball > i { position: absolute; inset: 0; border-radius: inherit; background: inherit; animation: var(--path) var(--t) ease-in-out infinite; }
+.paywall__ball--1 { width: 200px; height: 200px; right: -50px; top: -70px; background: radial-gradient(circle at 40% 40%, color-mix(in srgb, var(--paywall-ball-1) 50%, white), var(--paywall-ball-1) 70%); --path: paywall-a; --t: 11s; --d: 1; }
+.paywall__ball--2 { width: 140px; height: 140px; right: 90px; top: -50px; background: radial-gradient(circle at 40% 40%, color-mix(in srgb, var(--paywall-ball-2) 40%, white), var(--paywall-ball-2) 70%); --path: paywall-b; --t: 14s; --o: .7; --d: 1.6; }
+.paywall__ball--3 { width: 110px; height: 110px; right: -20px; top: 90px; background: radial-gradient(circle at 40% 40%, color-mix(in srgb, var(--paywall-ball-3) 35%, white), var(--paywall-ball-3) 70%); --path: paywall-c; --t: 9s; --o: .65; --d: .6; }
+[data-theme="dark"] .paywall__ball { --o: .6; }
+@keyframes paywall-a { 0%, 100% { transform: translate(0, 0) scale(1); } 33% { transform: translate(-28px, 18px) scale(1.08); } 66% { transform: translate(10px, 30px) scale(.95); } }
+@keyframes paywall-b { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-40px, 26px) scale(1.12); } }
+@keyframes paywall-c { 0%, 100% { transform: translate(0, 0) scale(1); } 40% { transform: translate(-22px, -16px) scale(.92); } 80% { transform: translate(12px, -6px) scale(1.06); } }
+
+/* Close: the only way out besides Escape and the ground. */
+.paywall__close { position: absolute; top: var(--space-4); right: var(--space-4); z-index: 3; width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: var(--radius-full); cursor: pointer; color: var(--text-2);
+  background: rgb(255 255 255 / .55); box-shadow: 0 1px 2px rgb(0 0 0 / .08), inset 0 1px 0 #fff; }
+.paywall__close:hover { color: var(--text); }
+.paywall__close .icon { width: 15px; height: 15px; }
+[data-theme="dark"] .paywall__close { background: rgb(255 255 255 / .08); box-shadow: inset 0 1px 0 rgb(255 255 255 / .12); }
+
+.paywall__in { position: relative; z-index: 2; display: flex; flex-direction: column; gap: var(--paywall-gap); padding: var(--paywall-pad) var(--paywall-pad) calc(var(--paywall-pad) - 6px); }
+.paywall__title { margin: 0; padding-right: var(--space-7); font-family: var(--font-display); font-size: var(--paywall-title-size); line-height: 1.1; font-weight: 650; letter-spacing: -.025em; text-wrap: balance; }
+
+/* The price: always the amount and the line under it, so switching never moves anything. */
+.paywall__pricerow { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+.paywall__price { display: flex; flex-direction: column; gap: var(--space-1); min-width: 0; font-variant-numeric: tabular-nums; }
+.paywall__amount { display: flex; align-items: baseline; gap: 6px; white-space: nowrap; }
+.paywall__amount b { font-size: var(--paywall-amount-size); font-weight: 650; letter-spacing: -.04em; line-height: 1; }
+.paywall__amount span { color: var(--text-2); font-size: 14px; }
+.paywall__billed { font-size: 12px; color: var(--text-detail); white-space: nowrap; }
+
+/* The switch: a pill that slides. */
+.paywall__bill { flex: none; position: relative; display: inline-grid; grid-template-columns: 1fr 1fr; padding: var(--space-1); border-radius: var(--radius-full); font-size: 13px;
+  background: rgb(16 24 40 / .05); box-shadow: inset 0 1px 2px rgb(16 24 40 / .08); }
+[data-theme="dark"] .paywall__bill { background: rgb(255 255 255 / .06); box-shadow: inset 0 1px 2px rgb(0 0 0 / .4); }
+.paywall__bill button { position: relative; z-index: 1; border: 0; background: none; padding: 6px 14px; color: var(--text-2); font: inherit; font-weight: 550; cursor: pointer; white-space: nowrap; }
+.paywall__bill button[aria-pressed="true"] { color: var(--text); }
+.paywall__bill em { margin-left: var(--space-1); font-style: normal; font-size: 11px; font-weight: 700; color: var(--paywall-action-color); }
+[data-theme="dark"] .paywall__bill em { color: var(--paywall-action-color-dark); }
+.paywall__bill i { position: absolute; top: var(--space-1); bottom: var(--space-1); left: var(--space-1); width: calc(50% - var(--space-1)); border-radius: var(--radius-full);
+  background: linear-gradient(180deg, #fff, #f4f6f9); box-shadow: 0 1px 3px rgb(16 24 40 / .14), 0 0 0 .5px rgb(16 24 40 / .06); transition: transform 360ms cubic-bezier(.2, .9, .2, 1.15); }
+[data-theme="dark"] .paywall__bill i { background: linear-gradient(180deg, rgb(255 255 255 / .18), rgb(255 255 255 / .08)); box-shadow: 0 1px 3px rgb(0 0 0 / .5), inset 0 1px 0 rgb(255 255 255 / .12); }
+.paywall__bill[data-on="1"] i { transform: translateX(100%); }
+
+/* What you get: under a hairline, a title and what it does, its check drawing itself in turn. */
+.paywall__list { list-style: none; display: flex; flex-direction: column; gap: var(--paywall-list-gap); margin: 0 0 var(--paywall-list-gap); padding: var(--paywall-list-gap) 0 0; border-top: var(--border-width) solid rgb(16 24 40 / .08); }
+[data-theme="dark"] .paywall__list { border-top-color: rgb(255 255 255 / .08); }
+.paywall__list li { display: flex; align-items: flex-start; gap: var(--space-3); opacity: 0; transform: translateY(4px); }
+.paywall.is-open .paywall__list li { animation: paywall-in 360ms cubic-bezier(.2, .9, .2, 1) forwards; animation-delay: calc(var(--i) * var(--paywall-check-step-ms) + var(--paywall-check-first-ms) - 60ms); }
+.paywall__tick { flex: none; display: grid; place-items: center; width: var(--paywall-check-size); height: var(--paywall-check-size); margin-top: 1px; color: var(--paywall-action-color); }
+[data-theme="dark"] .paywall__tick { color: var(--paywall-action-color-dark); }
+.paywall__tick svg { width: 100%; height: 100%; }
+.paywall__tick path { stroke-dasharray: 24; stroke-dashoffset: 24; }
+.paywall.is-open .paywall__tick path { animation: paywall-draw var(--paywall-check-ms) ease-out forwards; animation-delay: calc(var(--i) * var(--paywall-check-step-ms) + var(--paywall-check-first-ms)); }
+.paywall__perk { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.paywall__perk b { font-size: 15px; font-weight: 600; }
+.paywall__perk span { font-size: 13px; line-height: 1.4; color: var(--text-2); }
+@keyframes paywall-in { to { opacity: 1; transform: none; } }
+@keyframes paywall-draw { to { stroke-dashoffset: 0; } }
+
+/* The action: solid. */
+.paywall__action { height: var(--paywall-action-height); display: flex; align-items: center; justify-content: center; gap: var(--space-2); border: 0; border-radius: 14px; cursor: pointer;
+  font: inherit; font-size: 16px; font-weight: 600; color: #fff; background: var(--paywall-action-color); transition: background 140ms ease, transform 120ms ease; }
+.paywall__action:hover { background: var(--paywall-action-hover); }
+.paywall__action:active { transform: scale(.99); }
+.paywall__action .icon { width: 17px; height: 17px; }
+[data-theme="dark"] .paywall__action { background: var(--paywall-action-color-dark); color: var(--paywall-action-ink-dark); }
+.paywall__note { margin: -4px 0 0; text-align: center; font-size: 12px; color: var(--text-detail); }
+
+.paywall :focus-visible { outline: var(--focus-width) solid var(--accent); outline-offset: 2px; }
+.paywall__sheet:focus, .paywall__sheet:focus-visible { outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .paywall, .paywall__sheet, .paywall__bill i, .paywall__ball { transition: none; }
+  .paywall__ball > i { animation: none; }
+  .paywall__ball { transform: none; }
+  .paywall__list li, .paywall__tick path { animation: none !important; opacity: 1; transform: none; stroke-dashoffset: 0; }
+}

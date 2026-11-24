@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.34 (2026-11-24)
+
+- **`bend-ui/paywall`** (opt-in, new), approved in the artifact "Perks e Customização": the sheet that opens over an app and says what a plan gives. A title, the price with a monthly / yearly switch, the things you get (a title and what it does, each check drawing itself in turn), one action and a note. Glass, with three balls brushing its top corner that drift and lean toward the pointer; the action and the checks stay solid. It closes with its X, Escape or a click around it, takes the focus when it opens and gives it back when it closes.
+- Written with `Web.bend`: `PAYWALL.bend` gives the sheet as a view (`view`) and decides its state (`Sheet`, `closed`, `opened`, `shut`, `billed`, `leaned`, `closes`). Its measures and colours are `paywall_*`, all `# undecided`. `paywall.js` writes them as CSS variables and exports `focusSheet` for mount's `patched`.
+- `PAYWALL_LAWS.bend`: switching the billing never changes the price's shape (so the sheet keeps its size), the sheet starts closed, closing keeps the billing, Escape closes. `bun run check` proves them.
+- A Paywall page in the docs, run from a page written in Bend (`docs/paywall.bend`).
+
 ## 1.1.33 (2026-11-24)
 
 Motion between places, approved in the artifact "LawEditor Transition Lab", and a side bar that doesn't scroll sideways when closed.

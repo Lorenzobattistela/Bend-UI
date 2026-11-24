@@ -973,3 +973,30 @@ A page in a frame: `.inspect-host--fill` holds an `iframe.inspect-frame` with th
 A box is plain numbers (`{ x, y, w, h, pad, margin, rowGap, colGap, kids }` with `pad` and `margin` as `[top, right, bottom, left]`), so a page in a frame can read its own boxes and send them: `draw()` only needs them in the same measures as `at`. A band shows its number when it is at least `inspect_says_across` thick (or `inspect_says_along` wide, for one that stands); room between two children that isn't the part's own gap is not drawn.
 
 Ideas from: the box model overlay of Chrome DevTools and Firefox, the measures of Figma's Dev Mode, and the comment pins of Figma and of Claude's artifacts.
+
+## Paywall extension (1.1.34)
+
+`import "bend-ui/paywall"` adds the sheet that opens over an app and says what a plan gives: a title, the price with a monthly / yearly switch, the things you get (a title and what it does, each check drawing itself in turn), one action and a note. The sheet is glass, with balls brushing its top corner that drift and lean toward the pointer; the action and the checks stay solid. Existing components keep their definitions and appearance. Measures and colours live in `PAYWALL.bend` (`paywall_*`, all `# undecided`); `paywall.js` writes each as a CSS variable.
+
+It is written with `Web.bend`. The page keeps a `Pw.Sheet` in its state and draws `Pw.view`; the events that carry something (a key, the pointer) come back through `on_input`:
+
+```python
+import ./node_modules/bend-ui/PAYWALL.bend as Pw
+
+def render(+s: Pw.Sheet) -> Web.HTML<Ev>:
+  Pw.view(Ev, offer(), s, shut{}, monthly{}, yearly{}, subscribed{}, keyed{""}, leaned{0.0, 0.0})
+
+# on_event: opened{} -> Pw.opened(s), shut{} -> Pw.shut(s), monthly{} -> Pw.billed(s, False{}),
+# keyed{n} -> Pw.shut(s) when Pw.closes(n), leaned{x, y} -> Pw.leaned(s, x, y)
+```
+
+```js
+import { mount } from "bend-ui/web";
+import { focusSheet } from "bend-ui/paywall";
+import Page from "./plus.bend";
+mount(el, Page, { patched: focusSheet });   // the sheet takes the focus when it opens, and gives it back
+```
+
+Put the mount's element where the sheet should cover (it fills its nearest positioned parent). `PAYWALL_LAWS.bend` holds the owner's rules: switching the billing never changes the price's shape, so the sheet keeps its size; Escape closes.
+
+Ideas from: the checklist upgrade dialog of Neon UI, the plan upgrade dialogs of shadcn.io blocks, and the glass panels of visionOS.
